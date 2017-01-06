@@ -3,8 +3,7 @@ project (FileSharer)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(${COMMON_INCLUDE_DIRS})
-
 add_subdirectory(common)
+include_directories(${COMMON_INCLUDE_DIRS})
 add_subdirectory(client)
 add_subdirectory(tracker)
