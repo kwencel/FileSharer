@@ -1,0 +1,3 @@
+[submodule "common/logger/easyloggingpp"]
+	path = common/logger/easyloggingpp
+	url = https://github.com/easylogging/easyloggingpp
