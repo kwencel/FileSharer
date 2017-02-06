@@ -10,3 +10,5 @@ set(SOURCE_FILES
 include_directories(include)
 
 add_executable(client ${SOURCE_FILES})
+
+target_link_libraries(client ${Boost_LIBRARIES})
