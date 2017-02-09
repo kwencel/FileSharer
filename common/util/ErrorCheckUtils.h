@@ -30,7 +30,7 @@
 
 #define CHK_POS_EX(x) do { \
     int retval = (x); \
-    if (retval != 0) { \
+    if (retval < 0) { \
         LOG(ERROR) << "Runtime error: " << #x << " returned " << retval << " at " << __FILE__ << ":" << __LINE__; \
         throw std::runtime_error(#x); \
     } \
