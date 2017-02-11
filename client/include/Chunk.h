@@ -15,13 +15,19 @@ class Chunk {
          * @param realSize The real size of the data chunk will be storing
          * @param associatedFile File that chunk concerns
          */
-        Chunk(unsigned long long int id, unsigned int realSize, File *associatedFile);
+        Chunk(unsigned long id, unsigned realSize, File *associatedFile);
 
         /**
          * Returns the real chunk size (last chunk will probably have a realSize that is smaller than the chunk size.
          * @return Real size of the data contained within the chunk
          */
-        unsigned int getRealSize() const;
+        unsigned getRealSize() const;
+
+        /**
+         * Returns the chunk's ID
+         * @return Chunk ID
+         */
+        unsigned long getId() const;
 
         /**
          * Return the data contained within the chunk. If its not cached in data field it will be fetched from
@@ -48,13 +54,13 @@ class Chunk {
          * ID of the chunk. IDs are assigned chronogically until they cover the whole
          * file they are associated with.
          */
-        unsigned long long int id;
+        unsigned long id;
 
         /**
          * Real size could be smaller than chunk size if the chunk is the last one
          * and the data does not fill the chunk in full.
          */
-        unsigned int realSize;
+        unsigned realSize;
 
         /**
          * MD5 checksum of the chunk.
