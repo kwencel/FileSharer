@@ -16,5 +16,7 @@ int main() {
         kopiaChunks[i]->setData(sinewave.readChunkData(i));
     }
 
+    LOG(INFO)<< sinewave.getHash();
+
     return 0;
 }

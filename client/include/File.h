@@ -105,7 +105,7 @@ class File {
         /**
          * Writes file data to disk.
          * @param from File pointer offset which marks the beginning of the requested range to write
-         * @param howMany Number of bytes to writefrom the starting offset
+         * @param howMany Number of bytes to write from the starting offset
          * @param buffer File data to be written to disk in the requested range represented by a vector of chars
          * @return
          */
@@ -122,6 +122,14 @@ class File {
          * @param chunk Pointer to the chunk that is going to be written
          */
         void writeChunkData(Chunk *chunk);
+
+        /**
+         * Calculates the MD5 hash of the file in the given range of bytes.
+         * @param from File pointer offset which marks the beginning of the requested range to hash
+         * @param howMany Number of bytes from the 'file' offset which marks the end of requested range of bytes to hash
+         * @return MD5 hash calculated for the given range of bytes
+         */
+        std::string calculateHashMD5(uintmax_t from, uintmax_t howMany);
 };
 
 

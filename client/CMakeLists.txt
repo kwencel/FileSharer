@@ -3,16 +3,13 @@ project(Client)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
-set(SOURCE_FILES
-        src/Client.cpp
-        include/File.h
-        src/File.cpp
-        include/AbstractFileHandler.h
-        src/Chunk.cpp
-        include/Chunk.h)
+file(GLOB SOURCE_FILES "src/*.cpp")
+file(GLOB HEADER_FILES "include/*.h")
 
 include_directories(include)
 
-add_executable(client ${SOURCE_FILES})
+find_package(OpenSSL REQUIRED)
 
-target_link_libraries(client ${Boost_LIBRARIES})
+add_executable(client ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES})
+
+target_link_libraries(client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES})
