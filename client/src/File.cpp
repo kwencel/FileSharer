@@ -4,6 +4,7 @@
 #include <define.h>
 #include <openssl/md5.h>
 #include <iomanip>
+#include <CustomExceptions.h>
 
 File::File(const std::string &name) {
     this->name = name;
@@ -14,33 +15,36 @@ File::File(const std::string &name) {
         LOG(INFO) << "File " << name << " with size " << size << "B opened";
         // Check if the corresponding .meta file exists
         if (boost::filesystem::exists(name + ".meta")) {
-            // Partially downloaded file detected. Verify its condition.
+            // Partially downloaded file detected. Verify its condition and rebuild chunks info from .meta file
             verify();
         } else {
+            // Assuming the file is fully downloaded and ready to be shared
             LOG(INFO) << "Metadata for " << name << " does not exist";
+            createChunks();
             hash = calculateHashMD5(0, size);
-            createMeta();
         }
     } else {
-        throw std::runtime_error("File does not exists");
+        throw FileNotFoundError(name);
     }
 }
 
-File::File(const std::string &name, uintmax_t size) {
+File::File(const std::string &name, uintmax_t size, std::vector<std::string> chunksHashes) {
     this->size = size;
     fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-    createChunks();
+    createChunks(chunksHashes);
+    createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
     // TODO Preallocate file
 }
 
 bool File::verify() {
+    // TODO Read chunks info (hashes) from .meta file
     createChunks();
     return true;
 }
 
-void File::createMeta() {
-    createChunks();
+void File::createMeta(std::vector<std::string> &chunksHashes) {
+    // TODO Create .meta file to read expected chunks hashes from partially downloaded files after closing the program.
 }
 
 void File::createChunks() {
@@ -53,6 +57,17 @@ void File::createChunks() {
         chunks.push_back(new Chunk(id, CHUNK_SIZE, this));
     }
     chunks.push_back(new Chunk(id, remainder, this));
+}
+
+void File::createChunks(std::vector<std::string> &chunksHashes) {
+    unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
+    unsigned remainder = (unsigned) (size % CHUNK_SIZE);
+    chunks.reserve(chunksAmount);
+    unsigned long id;
+    for (id = 0; id < chunksAmount - 1; ++id) {
+        chunks.push_back(new Chunk(id, CHUNK_SIZE, this, chunksHashes[id]));
+    }
+    chunks.push_back(new Chunk(id, remainder, this, chunksHashes[id]));
 }
 
 uintmax_t File::getRealSize() {
@@ -145,4 +160,17 @@ std::string File::calculateHashMD5(uintmax_t from, uintmax_t howMany) {
         ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c[i];
     }
     return ss.str();
+}
+
+std::vector<std::string> File::getChunksHashes() {
+    std::vector<std::string> chunksHashes;
+    chunksHashes.reserve(chunks.size());
+    for (auto &&chunk : chunks) {
+        chunksHashes.push_back(chunk->getHash());
+    }
+    return chunksHashes;
+}
+
+File::~File() {
+    fileStream.close();
 }

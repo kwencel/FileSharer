@@ -16,24 +16,19 @@ class File {
         /**
          * Constructs the File given the path. Reads file contents from disk.
          * @param name Path to the the file
+         * @throw FileNotFoundError if file with given name does not exists
          */
         File(const std::string &name);
 
         /**
-         * Constructs the File with a given name and size overwriting the existing file.
+         * Constructs the to-be-downloaded File with a given name and size overwriting the existing file.
          * @param name Path to the file
          * @param size Size of the file
+         * @param chunksHashes Vector of target chunk hashes
          */
-        File(const std::string &name, uintmax_t size);
+        File(const std::string &name, uintmax_t size, std::vector<std::string> chunksHashes);
 
-        bool verify();
-
-        void createMeta();
-
-        /**
-         * Divides the file to parts called chunks.
-         */
-        void createChunks();
+        ~File();
 
         /**
          * @return Amount of chunks the file was divided to.
@@ -86,11 +81,16 @@ class File {
          */
         std::vector<char> readChunkData(Chunk *chunk);
 
+        /**
+         * @return Vector of chunks hashes
+         */
+        std::vector<std::string> getChunksHashes();
+
     private:
         std::string name;
         std::string hash;
         uintmax_t size;
-        std::vector<Chunk*> chunks;
+        std::vector<Chunk *> chunks;
         std::fstream fileStream;
         AbstractFileHandler *fileHandler;
 
@@ -107,7 +107,7 @@ class File {
          * @param from File pointer offset which marks the beginning of the requested range to write
          * @param howMany Number of bytes to write from the starting offset
          * @param buffer File data to be written to disk in the requested range represented by a vector of chars
-         * @return
+         * @return True if file stream is in the 'good' state (there was no I/O errors and EOF was not reached)
          */
         bool writeBytes(uintmax_t from, uintmax_t howMany, std::vector<char> buffer);
 
@@ -130,6 +130,26 @@ class File {
          * @return MD5 hash calculated for the given range of bytes
          */
         std::string calculateHashMD5(uintmax_t from, uintmax_t howMany);
+
+        /**
+         * Creates a vector of chunks using by accessing a fully downloaded file and calculating the hashes.
+         */
+        void createChunks();
+
+        /**
+         * Creates a vector of chunks using the vector of their expected hashes supplied in the argument.
+         * @param chunksHashes Vector storing the chunks hashes
+         */
+        void createChunks(std::vector<std::string> &chunksHashes);
+
+        /**
+         * Creates a .meta file containing expected chunks hashes to be able to resume downloading and sharing after
+         * the program is closed.
+         * @param chunksHashes Vector storing the chunks hashes
+         */
+        void createMeta(std::vector<std::string> &chunksHashes);
+
+        bool verify();
 };
 
 
