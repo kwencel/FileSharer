@@ -9,7 +9,9 @@ set(COMMON_HEADER_FILES ${HEADER_FILES} CACHE INTERNAL "" FORCE)
 
 set(COMMON_INCLUDE_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/logger/easyloggingpp/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/util"
 
         CACHE INTERNAL "" FORCE
         )
