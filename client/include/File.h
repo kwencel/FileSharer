@@ -69,7 +69,7 @@ class File {
 
         /**
          * Reads the part of file that is associated with the given chunk.
-         * @param chunkId ID of the chunk that is goin to be read
+         * @param chunkId ID of the chunk that is going to be read
          * @return Data of the given chunk represented by a vector of chars
          */
         std::vector<char> readChunkData(unsigned long chunkId);
@@ -143,7 +143,7 @@ class File {
         void createChunks(std::vector<std::string> &chunksHashes);
 
         /**
-         * Creates a .meta file containing expected chunks hashes to be able to resume downloading and sharing after
+         * Creates a .meta file containing expected chunks hashes to be able to resume operation after
          * the program is closed.
          * @param chunksHashes Vector storing the chunks hashes
          */

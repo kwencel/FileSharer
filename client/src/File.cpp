@@ -173,4 +173,7 @@ std::vector<std::string> File::getChunksHashes() {
 
 File::~File() {
     fileStream.close();
+    for (auto &&chunk : chunks) {
+        delete chunk;
+    }
 }
