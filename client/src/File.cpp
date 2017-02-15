@@ -11,8 +11,6 @@ File::File(const std::string &name) {
     // Check if the file already exists
     if (boost::filesystem::exists(name)) {
         fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary);
-        this->size = getRealSize();
-        LOG(INFO) << "File " << name << " with size " << size << "B opened";
         // Check if the corresponding .meta file exists
         if (boost::filesystem::exists(name + ".meta")) {
             // Partially downloaded file detected. Verify its condition and rebuild chunks info from .meta file
@@ -20,16 +18,20 @@ File::File(const std::string &name) {
         } else {
             // Assuming the file is fully downloaded and ready to be shared
             LOG(INFO) << "Metadata for " << name << " does not exist";
+            size = getRealSize();
             createChunks();
             hash = calculateHashMD5(0, size);
         }
+        LOG(INFO) << "File " << name << " with size " << size << "B opened";
     } else {
         throw FileNotFoundError(name);
     }
 }
 
-File::File(const std::string &name, uintmax_t size, std::vector<std::string> chunksHashes) {
+File::File(const std::string &name, unsigned long size, std::string fileHash, std::vector<std::string> chunksHashes) {
+    this->name = name;
     this->size = size;
+    this->hash = fileHash;
     fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
     createChunks(chunksHashes);
     createMeta(chunksHashes);
@@ -37,14 +39,30 @@ File::File(const std::string &name, uintmax_t size, std::vector<std::string> chu
     // TODO Preallocate file
 }
 
-bool File::verify() {
-    // TODO Read chunks info (hashes) from .meta file
-    createChunks();
-    return true;
+void File::verify() {
+    std::ifstream meta;
+    meta.open(name + ".meta", std::ios::in);
+    meta >> hash;
+    meta >> size;
+    unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
+    std::vector<std::string> chunksHashes;
+    chunksHashes.reserve(chunksAmount);
+    for (unsigned long i = 0; i < chunksAmount; ++i) {
+        std::string chunkHash;
+        meta >> chunkHash;
+        chunksHashes.push_back(chunkHash);
+    }
+    createChunks(chunksHashes);
 }
 
 void File::createMeta(std::vector<std::string> &chunksHashes) {
-    // TODO Create .meta file to read expected chunks hashes from partially downloaded files after closing the program.
+    std::ofstream meta;
+    meta.open(name + ".meta", std::ios::out | std::ios::trunc);
+    meta << hash << std::endl;
+    meta << size << std::endl;
+    for (unsigned long i = 0; i < chunksHashes.size(); ++i) {
+        meta << chunksHashes[i] << std::endl;
+    }
 }
 
 void File::createChunks() {
@@ -70,7 +88,7 @@ void File::createChunks(std::vector<std::string> &chunksHashes) {
     chunks.push_back(new Chunk(id, remainder, this, chunksHashes[id]));
 }
 
-uintmax_t File::getRealSize() {
+unsigned long File::getRealSize() {
     return boost::filesystem::file_size(name);
 }
 
@@ -86,7 +104,7 @@ void File::writeChunkData(unsigned long chunkId) {
 
 void File::writeChunkData(Chunk *chunk) {
     unsigned howMany = chunk->getRealSize();
-    uintmax_t from = chunk->getId() * CHUNK_SIZE;
+    unsigned long from = chunk->getId() * CHUNK_SIZE;
     writeBytes(from, howMany, chunk->getData());
 }
 
@@ -97,7 +115,7 @@ std::vector<char> File::readChunkData(unsigned long chunkId) {
 
 std::vector<char> File::readChunkData(Chunk *chunk) {
     unsigned howMany = chunk->getRealSize();
-    uintmax_t from = chunk->getId() * CHUNK_SIZE;
+    unsigned long from = chunk->getId() * CHUNK_SIZE;
     return readBytes(from, howMany);
 }
 
@@ -109,7 +127,7 @@ const std::vector<Chunk *> File::getChunks() const {
     return chunks;
 }
 
-std::vector<char> File::readBytes(uintmax_t from, uintmax_t howMany) {
+std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
     fileStream.clear(fileStream.eofbit);
     fileStream.seekg(from);
     std::vector<char> buffer(howMany);
@@ -121,7 +139,7 @@ std::vector<char> File::readBytes(uintmax_t from, uintmax_t howMany) {
     return buffer;
 }
 
-bool File::writeBytes(uintmax_t from, uintmax_t howMany, std::vector<char> buffer) {
+bool File::writeBytes(unsigned long from, unsigned long howMany, std::vector<char> buffer) {
     fileStream.clear(fileStream.eofbit);
     fileStream.seekg(from);
     fileStream.write(buffer.data(), howMany);
@@ -136,17 +154,17 @@ std::string File::getHash() const {
     return hash;
 }
 
-uintmax_t File::getSize() const {
+unsigned long File::getSize() const {
     return size;
 }
 
-std::string File::calculateHashMD5(uintmax_t from, uintmax_t howMany) {
+std::string File::calculateHashMD5(unsigned long from, unsigned long howMany) {
     MD5_CTX mdContext;
     MD5_Init(&mdContext);
     unsigned char c[MD5_DIGEST_LENGTH];
 
     std::vector<char> buffer;
-    uintmax_t endPos = from + howMany;
+    unsigned long endPos = from + howMany;
 
     do {
         buffer = readBytes(from, MD5_BUFFER_SIZE);

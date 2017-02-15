@@ -7,7 +7,7 @@ INITIALIZE_EASYLOGGINGPP
 int main() {
     File sinewave("example_file.flac");
 
-    File kopia("kopia_chunked.flac", boost::filesystem::file_size("example_file.flac"), sinewave.getChunksHashes());
+    File kopia("kopia_chunked.flac", sinewave.getRealSize(), sinewave.getHash(), sinewave.getChunksHashes());
 
     std::vector<Chunk *> kopiaChunks = kopia.getChunks();
 

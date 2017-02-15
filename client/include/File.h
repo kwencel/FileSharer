@@ -26,7 +26,8 @@ class File {
          * @param size Size of the file
          * @param chunksHashes Vector of target chunk hashes
          */
-        File(const std::string &name, uintmax_t size, std::vector<std::string> chunksHashes);
+        File(const std::string &name, unsigned long size, std::string fileHash,
+             std::vector<std::string> chunksHashes);
 
         ~File();
 
@@ -53,13 +54,13 @@ class File {
         /**
          * @return Target size of the file.
          */
-        uintmax_t getSize() const;
+        unsigned long getSize() const;
 
         /**
          * @return Real size of the file (could be smaller than the target size because the file grows up while it's
          *         being downloaded
          */
-        uintmax_t getRealSize();
+        unsigned long getRealSize();
 
         /**
          * Notifies the file that one of its chunk got downloaded and is ready to be written to disk
@@ -100,7 +101,7 @@ class File {
          * @param howMany Number of bytes to read from the starting offset
          * @return File data read from disk in the requested range represented by a vector of chars
          */
-        std::vector<char> readBytes(uintmax_t from, uintmax_t howMany);
+        std::vector<char> readBytes(unsigned long from, unsigned long howMany);
 
         /**
          * Writes file data to disk.
@@ -109,7 +110,7 @@ class File {
          * @param buffer File data to be written to disk in the requested range represented by a vector of chars
          * @return True if file stream is in the 'good' state (there was no I/O errors and EOF was not reached)
          */
-        bool writeBytes(uintmax_t from, uintmax_t howMany, std::vector<char> buffer);
+        bool writeBytes(unsigned long from, unsigned long howMany, std::vector<char> buffer);
 
         /**
          * Writes the contents of a given chunk to disk.
@@ -129,7 +130,7 @@ class File {
          * @param howMany Number of bytes from the 'file' offset which marks the end of requested range of bytes to hash
          * @return MD5 hash calculated for the given range of bytes
          */
-        std::string calculateHashMD5(uintmax_t from, uintmax_t howMany);
+        std::string calculateHashMD5(unsigned long from, unsigned long howMany);
 
         /**
          * Creates a vector of chunks using by accessing a fully downloaded file and calculating the hashes.
@@ -149,7 +150,10 @@ class File {
          */
         void createMeta(std::vector<std::string> &chunksHashes);
 
-        bool verify();
+        /**
+         * Verifies the partially downloaded file condition and restores the vector of Chunk based on the .meta file.
+         */
+        void verify();
 };
 
 
