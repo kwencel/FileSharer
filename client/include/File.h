@@ -7,7 +7,7 @@
 #include <AbstractFileHandler.h>
 #include <array>
 #include <Chunk.h>
-#include <define.h>
+#include <Define.h>
 
 class Chunk;
 

@@ -6,7 +6,7 @@
 #include <boost/optional.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include "FileInfo.h"
+#include <FileInfo.h>
 
 class Peer {
     public:

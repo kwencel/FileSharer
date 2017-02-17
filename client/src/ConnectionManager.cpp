@@ -1,6 +1,6 @@
 #include <dnet.h>
 #include <iostream>
-#include <define.h>
+#include <Define.h>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
 #include "ConnectionManager.h"

@@ -1,7 +1,6 @@
 #include "ProtocolTranslator.h"
 #include "SerializationHelper.h"
-#include "FileInfo.h"
-#include "define.h"
+#include "Define.h"
 
 ProtocolTranslator::ProtocolTranslator() {
 

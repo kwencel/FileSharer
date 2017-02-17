@@ -1,7 +1,6 @@
 #include <File.h>
 #include <easylogging++.h>
 #include <boost/filesystem.hpp>
-#include <define.h>
 #include <openssl/md5.h>
 #include <iomanip>
 #include <CustomExceptions.h>

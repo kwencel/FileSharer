@@ -2,13 +2,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <define.h>
+#include <Define.h>
 #include "ProtocolTranslator.h"
 #include "ErrorCheckUtils.h"
-#include "Peer.h"
-#include "FileInfo.h"
 #include <boost/serialization/vector.hpp>
-#include "SerializationHelper.h"
 
 INITIALIZE_EASYLOGGINGPP
 
