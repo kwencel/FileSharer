@@ -13,6 +13,14 @@
     } \
 } while (0)
 
+#define CHK_MSG(x, y) do { \
+    int retval = (x); \
+    if (retval != 0) { \
+        LOG(ERROR) << "Runtime error: " << #x << " returned " << retval << " at " << __FILE__ << ":" << __LINE__; \
+        perror(y); \
+    } \
+} while (0)
+
 #define CHK_POS(x) do { \
     int retval = (x); \
     if (retval < 0) { \

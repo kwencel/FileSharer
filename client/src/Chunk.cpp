@@ -1,9 +1,14 @@
 #include "Chunk.h"
+#include <CustomExceptions.h>
+#include <openssl/md5.h>
+#include <sstream>
+#include <iomanip>
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
-        id(id), realSize(realSize), associatedFile(associatedFile) {
+        id(id), realSize(realSize), associatedFile(associatedFile) { }
 
-}
+Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
+        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash), downloaded(true) { }
 
 unsigned Chunk::getRealSize() const {
     return realSize;
@@ -18,6 +23,13 @@ std::vector<char> &Chunk::getData() {
 }
 
 void Chunk::setData(std::vector<char> data) {
+    if (data.size() != realSize) {
+        throw ChunkSizeMismatchError(realSize, data.size());
+    }
+    std::string calculatedHash = calculateHashMD5(data);
+    if (getHash() != calculatedHash) {
+        throw ChunkHashMismatchError(hash, calculatedHash);
+    }
     this->data = data;
     associatedFile->notifyChunkDownloaded(id);
 }
@@ -25,3 +37,30 @@ void Chunk::setData(std::vector<char> data) {
 unsigned long Chunk::getId() const {
     return id;
 }
+
+const std::string Chunk::getHash() {
+    if (hash.empty()) {
+        hash = calculateHashMD5(getData());
+    }
+    return hash;
+}
+
+bool Chunk::isDownloaded() const {
+    return downloaded;
+}
+
+std::string Chunk::calculateHashMD5(std::vector<char>& buffer) {
+    MD5_CTX mdContext;
+    MD5_Init(&mdContext);
+    unsigned char c[MD5_DIGEST_LENGTH];
+
+    MD5_Update(&mdContext, buffer.data(), buffer.size());
+    MD5_Final(c, &mdContext);
+
+    std::stringstream ss;
+    for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+        ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c[i];
+    }
+    return ss.str();
+}
+
