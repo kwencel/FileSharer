@@ -51,7 +51,7 @@ class Connection {
          * @param howMany Number of bytes to be read
          * @return Received information
          */
-        std::string receive(ssize_t howMany = RECEIVE_BUFFER);
+        std::string receive(size_t howMany = RECEIVE_BUFFER);
 
     private:
         /**

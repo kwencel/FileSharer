@@ -7,8 +7,8 @@
 
 ConnectionManager::ConnectionManager() {
     ownSocket.sin_family = AF_INET;
-    ownSocket.sin_port = htons(BIND_PORT);
-    ownSocket.sin_addr.s_addr = inet_addr(BIND_IP);
+    ownSocket.sin_port = htons(CLIENT_BIND_PORT);
+    ownSocket.sin_addr.s_addr = inet_addr(CLIENT_BIND_IP);
     ownSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     CHK_MSG(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)), "Connection Manager Bind");
 }

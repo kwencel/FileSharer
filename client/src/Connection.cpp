@@ -36,7 +36,7 @@ ssize_t Connection::send(std::string data) {
     return write(peerSocketDescriptor, data.c_str(), data.length());
 }
 
-std::string Connection::receive(ssize_t howMany) {
+std::string Connection::receive(size_t howMany) {
     std::string data;
     ssize_t readBytes = 0;
     char buffer[RECEIVE_BUFFER];
