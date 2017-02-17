@@ -22,6 +22,8 @@ class FileInfo {
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
+            ar & filename;
+            ar & hash;
             ar & availableChunks;
         }
 
@@ -51,6 +53,14 @@ class FileInfo {
         std::string filename;
         std::string hash;
         std::vector<bool> availableChunks;
+};
+
+
+struct FileInfoHasher {
+    size_t operator() (const FileInfo &fileInfo) const {
+        std::string temp = fileInfo.getFilename() + fileInfo.getHash();
+        return (temp.length());
+    }
 };
 
 #endif //FILESHARER_FILEINFO_H

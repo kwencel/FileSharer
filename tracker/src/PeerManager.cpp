@@ -19,5 +19,20 @@ std::vector<Peer> PeerManager::getPeersWithFile(std::string hash) {
     return peersWithFile;
 }
 
+std::unordered_set<FileInfo, FileInfoHasher> PeerManager::getDistinctFiles() {
+    std::unordered_set<FileInfo, FileInfoHasher> distinctFiles;
+    std::unordered_set<std::string> hashes;
+    for (Peer &p : peerList) {
+        std::vector<FileInfo> fileList = p.getFileList();
+        for (FileInfo &fi : fileList) {
+            if (hashes.find(fi.getHash()) != hashes.end()) {
+                //distinctFiles.insert(fi);
+                hashes.insert(fi.getHash()); //TODO implement hash for FileInfo
+            }
+        }
+    }
+    return distinctFiles;
+}
+
 
 

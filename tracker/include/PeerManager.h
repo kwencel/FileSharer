@@ -25,6 +25,8 @@ class PeerManager {
          * chunks are available
          */
         std::vector<Peer> getPeersWithFile(std::string hash);
+
+        std::unordered_set<FileInfo, FileInfoHasher> getDistinctFiles();
     private:
         std::vector<Peer> peerList;
 };

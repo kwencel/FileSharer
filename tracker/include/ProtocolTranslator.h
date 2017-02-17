@@ -15,6 +15,7 @@ class ProtocolTranslator {
         std::string generateResponse(char message[]);
 
         void addPeer(Peer peer);
+
     private:
         PeerManager peerManager;
         /**
@@ -22,25 +23,25 @@ class ProtocolTranslator {
          */
         enum MessageType
         {
-            MSG_HELLO,
-            MSG_PEERS_WITH_FILE,
+            MSG_DEFAULT,
             MSG_PEER_REGISTRATION,
-            MSG_TEST
+            MSG_PEERS_WITH_FILE,
+            MSG_LIST_FILES
         };
 
         /**
          * Returns the type of message as decoded from message header
-         * @param message Message read from socket
+         * @param message Message read from socket (converted to string by generateResponse())
          * @return Value of type MessageType to which the header has been decoded
          */
-        MessageType decodeHeader(char message[]);
+        MessageType decodeHeader(std::string &message);
 
         /**
          * Creates a string response depending on decoded header
          * @param header Header of the message
          * @return String response to be sent to client
          */
-        std::string createResponse(MessageType header);
+        std::string createResponse(MessageType header, std::string message);
 };
 
 #endif //FILESHARER_PROTOCOLTRANSLATOR_H

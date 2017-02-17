@@ -16,7 +16,7 @@ class Peer {
          * @param port Port to which peer connected
          * @param fileList Vector of FileInfo of files that the peer has and uploads
          */
-        Peer(std::string ip, int port, std::vector<FileInfo> fileList);
+        Peer(std::string ip, std::vector<FileInfo> fileList);
         Peer();
 
         /**
@@ -42,14 +42,10 @@ class Peer {
          */
         boost::optional<std::vector<bool>> checkForFile(std::string hash);
 
-        /**
-         * @return IP number of peer
-         */
-        const std::string &getIp() const;
+        const std::vector<FileInfo> getFileList() const;
 
     private:
         std::string ip;
-        int port;
         std::vector<FileInfo> fileList;
 
 };

@@ -1,8 +1,7 @@
 #include "Peer.h"
 
-Peer::Peer(std::string ip, int port, std::vector<FileInfo> fileList) {
+Peer::Peer(std::string ip, std::vector<FileInfo> fileList) {
     this->ip = ip;
-    this->port = port;
     this->fileList = fileList;
 }
 
@@ -23,10 +22,6 @@ boost::optional<std::vector<bool>> Peer::checkForFile(std::string hash) {
     return boost::none;
 }
 
-const std::string &Peer::getIp() const {
-    return ip;
-}
-
 void Peer::printSerializedInfo() {
     printf("IP = %s\nBool vector = ", ip.c_str());
     for (FileInfo &f: fileList) {
@@ -35,4 +30,8 @@ void Peer::printSerializedInfo() {
             fflush(stdout);
         }
     }
+}
+
+const std::vector<FileInfo> Peer::getFileList() const {
+    return this->fileList;
 }
