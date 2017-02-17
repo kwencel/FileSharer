@@ -1,4 +1,5 @@
 #include "ProtocolTranslator.h"
+#include "define.h"
 
 ProtocolTranslator::ProtocolTranslator() {
 
@@ -12,8 +13,8 @@ std::string ProtocolTranslator::generateResponse(char message[]) {
 ProtocolTranslator::MessageType ProtocolTranslator::decodeHeader(char message[]) {
     MessageType header;
     char firstByte = message[0];
-    if (firstByte == 1) header = MSG_PEER_REGISTRATION;
-    else if (firstByte == 2) header = MSG_PEERS_WITH_FILE;
+    if (firstByte == PROTOCOL_HEADER_REGISTER) header = MSG_PEER_REGISTRATION;
+    else if (firstByte == PROTOCOL_HEADER_FILE_REQUEST) header = MSG_PEERS_WITH_FILE;
     else header = MSG_HELLO;
 
     return header;
