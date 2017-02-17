@@ -14,6 +14,10 @@ class ProtocolTranslator {
          */
         std::string generateResponse(char message[]);
 
+        /**
+         * Add peer to PeerManager (calls PeerManager::addPeer())
+         * @param peer Peer to be added
+         */
         void addPeer(Peer peer);
 
     private:

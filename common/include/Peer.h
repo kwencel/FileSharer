@@ -32,8 +32,6 @@ class Peer {
             ar & fileList;
         }
 
-        void printSerializedInfo();
-
         /**
          * Checks if this peer has uploaded a certain file (identified by its hash) and returns a vector of chunk availability
          * @param hash Hash of the requested file
@@ -42,6 +40,9 @@ class Peer {
          */
         boost::optional<std::vector<bool>> checkForFile(std::string hash);
 
+        /**
+         * @return List of peers files as a vector of type FileInfo
+         */
         const std::vector<FileInfo> getFileList() const;
 
     private:

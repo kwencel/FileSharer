@@ -22,16 +22,6 @@ boost::optional<std::vector<bool>> Peer::checkForFile(std::string hash) {
     return boost::none;
 }
 
-void Peer::printSerializedInfo() {
-    printf("IP = %s\nBool vector = ", ip.c_str());
-    for (FileInfo &f: fileList) {
-        for (bool b: f.getAvailableChunks()) {
-            printf("%d ", b);
-            fflush(stdout);
-        }
-    }
-}
-
 const std::vector<FileInfo> Peer::getFileList() const {
     return this->fileList;
 }

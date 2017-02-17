@@ -26,6 +26,10 @@ class PeerManager {
          */
         std::vector<Peer> getPeersWithFile(std::string hash);
 
+        /**
+         * Find all distinct files (by hash) among all peers
+         * @return Unordered set of FileInfo instances with unique hashes
+         */
         std::unordered_set<FileInfo, FileInfoHasher> getDistinctFiles();
     private:
         std::vector<Peer> peerList;
