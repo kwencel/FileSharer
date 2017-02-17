@@ -1,9 +1,12 @@
 #ifndef FILESHARER_DEFINE_H
 #define FILESHARER_DEFINE_H
 
-#define CHUNK_SIZE_KB 128
+#define CHUNK_SIZE_KB   128
 #define MD5_BUFFER_SIZE 1024
+#define BIND_IP         "127.0.0.1"
+#define BIND_PORT       2048
+#define RECEIVE_BUFFER  1024
 
-#define CHUNK_SIZE (1024 * CHUNK_SIZE_KB)
+#define CHUNK_SIZE      (1024 * CHUNK_SIZE_KB)
 
 #endif //FILESHARER_DEFINE_H

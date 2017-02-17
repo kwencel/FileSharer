@@ -1,6 +1,7 @@
 #include <easylogging++.h>
 #include <File.h>
 #include <boost/filesystem/operations.hpp>
+#include <ConnectionManager.h>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -15,7 +16,11 @@ int main() {
         kopiaChunks[i]->setData(sinewave.readChunkData(i));
     }
 
-    LOG(INFO)<< sinewave.getHash();
+    std::cout << sinewave.getHash();
+
+    Connection connection("127.0.0.1", 2048);
+    connection.send(sinewave.getHash());
+    connection.send("test");
 
     return 0;
 }
