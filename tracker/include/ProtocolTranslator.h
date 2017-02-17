@@ -13,6 +13,8 @@ class ProtocolTranslator {
          * @return String response to be sent to client
          */
         std::string generateResponse(char message[]);
+
+        void addPeer(Peer peer);
     private:
         PeerManager peerManager;
         /**
@@ -22,7 +24,8 @@ class ProtocolTranslator {
         {
             MSG_HELLO,
             MSG_PEERS_WITH_FILE,
-            MSG_PEER_REGISTRATION
+            MSG_PEER_REGISTRATION,
+            MSG_TEST
         };
 
         /**

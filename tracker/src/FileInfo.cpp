@@ -6,6 +6,10 @@ FileInfo::FileInfo(const std::string filename, const std::string hash, std::vect
     this->availableChunks = availableChunks;
 }
 
+FileInfo::FileInfo() {
+
+}
+
 bool FileInfo::compareHash(std::string hashToCompare) {
     return (this->hash == hashToCompare);
 }

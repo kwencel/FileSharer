@@ -24,7 +24,7 @@ class PeerManager {
          * @return Vector of pairs of ip of peer with the file and a vector of bool denoting which
          * chunks are available
          */
-        std::vector<std::pair<std::string, std::vector<bool>>> getPeersWithFile(std::string hash);
+        std::vector<Peer> getPeersWithFile(std::string hash);
     private:
         std::vector<Peer> peerList;
 };
