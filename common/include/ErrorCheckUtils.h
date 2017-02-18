@@ -18,6 +18,8 @@
     if (retval != 0) { \
         LOG(ERROR) << "Runtime error: " << #x << " returned " << retval << " at " << __FILE__ << ":" << __LINE__; \
         perror(y); \
+    } else { \
+        LOG(INFO) << y << " successful"; \
     } \
 } while (0)
 

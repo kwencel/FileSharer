@@ -11,7 +11,7 @@
 
 class ConnectionManager {
     public:
-        static ConnectionManager &getInstance();
+        static ConnectionManager &getInstance(std::string bindIP  = CLIENT_BIND_IP, uint16_t bindPort = CLIENT_BIND_PORT);
 
         sockaddr_in getOwnSocket();
         std::string getOwnIP();
@@ -22,15 +22,17 @@ class ConnectionManager {
         void listenLoop();
 
     private:
-        ConnectionManager();
-        ConnectionManager(const ConnectionManager &) = delete;
-        ConnectionManager& operator=(const ConnectionManager&) = delete;
+        ConnectionManager(std::string bindIP, uint16_t bindPort);
         virtual ~ConnectionManager();
 
         sockaddr_in ownSocket;
         int ownSocketDescriptor;
         std::unordered_set<std::shared_ptr<Connection>> connections;
         std::mutex connectionsMutex;
+
+        ConnectionManager() = delete;
+        ConnectionManager(const ConnectionManager &) = delete;
+        ConnectionManager& operator=(const ConnectionManager&) = delete;
 };
 
 

@@ -1,20 +1,20 @@
 #include <dnet.h>
 #include <iostream>
-#include <Define.h>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
 #include "ConnectionManager.h"
 
-ConnectionManager::ConnectionManager() {
+ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocket.sin_family = AF_INET;
-    ownSocket.sin_port = htons(CLIENT_BIND_PORT);
-    ownSocket.sin_addr.s_addr = inet_addr(CLIENT_BIND_IP);
+    ownSocket.sin_port = htons(bindPort);
+    ownSocket.sin_addr.s_addr = inet_addr(bindIP.c_str());
     ownSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-    CHK_MSG(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)), "Connection Manager Bind");
+    CHK_MSG(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)),
+            std::string("ConnectionManager bind to " + getOwnIP() + ":" + std::to_string(getOwnPort())).c_str());
 }
 
-ConnectionManager &ConnectionManager::getInstance() {
-    static ConnectionManager instance;
+ConnectionManager &ConnectionManager::getInstance(std::string bindIP, uint16_t bindPort) {
+    static ConnectionManager instance(bindIP, bindPort);
     return instance;
 }
 
