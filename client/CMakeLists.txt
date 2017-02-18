@@ -13,7 +13,7 @@ find_package(Threads REQUIRED)
 
 add_executable(client ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES})
 add_executable(test_client test_client/TestClient.cpp include/Connection.h src/Connection.cpp
-               src/ConnectionManager.cpp include/ConnectionManager.h)
+               src/ConnectionManager.cpp include/ConnectionManager.h ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES})
 
 target_link_libraries(client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} Threads::Threads)
 target_link_libraries(test_client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} Threads::Threads)

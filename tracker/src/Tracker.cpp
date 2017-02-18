@@ -14,7 +14,7 @@ int main() {
 
     struct sockaddr_in address;
     socklen_t addressSize = sizeof(address);
-    size_t bufferSize = 128;
+    size_t bufferSize = 1024;
     char buffer[bufferSize];
     memset(&address, '\0', addressSize);
     memset(&buffer, '\0', bufferSize);

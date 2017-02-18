@@ -5,6 +5,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/unordered_set.hpp>
+#include <boost/serialization/utility.hpp>
 
 namespace SerializationHelper {
 
@@ -16,9 +17,22 @@ namespace SerializationHelper {
      */
     template<typename T>
     static std::string serialize(T object) {
-        std::stringstream archive_stream;
-        boost::archive::text_oarchive archive(archive_stream);
-        archive << object;
+        std::ostringstream archive_stream;
+        {
+            boost::archive::text_oarchive archive(archive_stream);
+            archive << object;
+        }
+        return archive_stream.str();
+    }
+
+    template<typename T>
+    static std::string serialize(char header, T object) {
+        std::ostringstream archive_stream;
+        {
+            boost::archive::text_oarchive archive(archive_stream);
+            archive << header;
+            archive << object;
+        }
         return archive_stream.str();
     }
 
@@ -28,13 +42,29 @@ namespace SerializationHelper {
      * @param serializedObject String to deserialize
      * @return Deserialized object of type T
      */
-    template<typename T>
-    static T deserialize(std::string &serializedObject) {
+    static char deserializeHeader(std::string &serializedObject) {
+        char header;
         std::stringstream archive_stream;
         archive_stream << serializedObject;
-        boost::archive::text_iarchive archive(archive_stream);
+        {
+            boost::archive::text_iarchive archive(archive_stream);
+            archive >> header;
+        }
+        return header;
+    }
+
+    template<typename T>
+    static T deserialize(std::string &serializedObject) {
+        char header;
         T deserializedObject;
-        archive >> deserializedObject;
+        std::stringstream archive_stream;
+        archive_stream << serializedObject;
+        {
+            boost::archive::text_iarchive archive(archive_stream);
+            archive >> header;
+            archive >> deserializedObject;
+        }
+        return deserializedObject;
     }
 }
 
