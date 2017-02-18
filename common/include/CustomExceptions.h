@@ -22,6 +22,11 @@ class ChunkHashMismatchError : public std::runtime_error {
                 std::runtime_error("Got data vector hash " + gotHash + " instead of expected " + chunkHash) { }
 };
 
+class ConnectionError: public std::runtime_error {
+    public:
+        ConnectionError(const std::string &reason) : std::runtime_error(reason) {}
+};
+
 class FileNotFoundError : public std::runtime_error {
     public:
         FileNotFoundError(std::string filename) :

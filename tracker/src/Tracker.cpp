@@ -22,7 +22,7 @@ int main() {
     int serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     address.sin_family = AF_INET;
     address.sin_port = htons(TRACKER_BIND_PORT);
-    address.sin_addr.s_addr = TRACKER_BIND_IP;
+    address.sin_addr.s_addr = inet_addr(TRACKER_BIND_IPZ);
 
     bind(serverSocket, (struct sockaddr *) &address, addressSize);
     listen(serverSocket, 10);

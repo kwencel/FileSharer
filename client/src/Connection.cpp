@@ -3,6 +3,7 @@
 #include <easylogging++.h>
 #include "Connection.h"
 #include <unistd.h>
+#include <CustomExceptions.h>
 
 Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocket.sin_family = AF_INET;
@@ -10,7 +11,7 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocket.sin_addr.s_addr = inet_addr(peerIP.c_str());
     peerSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     CHK_CUSTOM(connect(peerSocketDescriptor, (sockaddr *)&peerSocket, sizeof(peerSocket)),
-               (throw std::runtime_error(std::string("Outgoing connection creation: ") + strerror(errno))));
+               (throw ConnectionError(std::string("Outgoing connection creation: ") + strerror(errno))));
 }
 
 Connection::Connection(int peerSocketDescriptor, sockaddr_in peerSocket) {

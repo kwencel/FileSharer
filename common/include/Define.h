@@ -12,7 +12,7 @@
 
 //TRACKER
 
-#define TRACKER_BIND_IP     INADDR_ANY
+#define TRACKER_BIND_IP     "127.0.0.1"
 #define TRACKER_BIND_PORT   1024
 
 //PROTOCOL
