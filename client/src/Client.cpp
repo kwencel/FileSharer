@@ -1,3 +1,5 @@
+#include "MainWindow.h"
+#include <QApplication>
 #include <easylogging++.h>
 #include <File.h>
 #include <boost/filesystem/operations.hpp>
@@ -5,7 +7,7 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-int main() {
+int main(int argc, char *argv[]) {
     File sinewave("example_file.flac");
 
     File kopia("kopia_chunked.flac", sinewave.getRealSize(), sinewave.getHash(), sinewave.getChunksHashes());
@@ -16,11 +18,10 @@ int main() {
         kopiaChunks[i]->setData(sinewave.readChunkData(i));
     }
 
-    std::cout << sinewave.getHash();
-
-    Connection connection("127.0.0.1", 2048);
-    connection.send(sinewave.getHash());
-    connection.send("test");
+    std::cout << QT_VERSION_STR;
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
 
     return 0;
 }

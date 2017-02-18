@@ -5,10 +5,16 @@
 INITIALIZE_EASYLOGGINGPP
 
 int main() {
-    ConnectionManager::getInstance("127.0.0.1", 2049).listenLoop();
-    std::shared_ptr<Connection> conn = ConnectionManager::getInstance().requestConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-    conn.get()->send("1");
-    std::cout << conn.get()->receive();
+    ConnectionManager &cm = ConnectionManager::getInstance("192.168.1.103", 2048);
+    cm.listenLoop();
+//    cm.listenLoop();
+//    std::cout << "Press to connect to 2049\n";
+//    getchar();
+//    std::unordered_set<std::shared_ptr<Connection>> connections = cm.getActiveConnections();
+//    for (const auto& conn : connections) {
+//        conn.get().
+//    }
+//    std::cout << conn.get()->receive();
 
     while(1);
     return 0;

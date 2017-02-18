@@ -32,7 +32,7 @@ class ConnectionManager {
 
         ConnectionManager() = delete;
         ConnectionManager(const ConnectionManager &) = delete;
-        ConnectionManager& operator=(const ConnectionManager&) = delete;
+//        ConnectionManager& operator=(const ConnectionManager&) = delete;
 };
 
 
