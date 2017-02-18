@@ -27,6 +27,8 @@ class FileInfo {
             ar & availableChunks;
         }
 
+        std::string printChunks();
+
         /**
          * Compares file's hash to the one given as the argument
          * @param hashToCompare Hash to compare against file hash

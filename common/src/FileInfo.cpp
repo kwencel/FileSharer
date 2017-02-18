@@ -10,6 +10,14 @@ FileInfo::FileInfo() {
 
 }
 
+std::string FileInfo::printChunks() {
+    std::string chunks;
+    for (bool b : availableChunks) {
+        chunks += std::to_string(b);
+    }
+    return chunks;
+}
+
 bool FileInfo::compareHash(std::string hashToCompare) {
     return (this->hash == hashToCompare);
 }

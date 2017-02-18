@@ -24,13 +24,13 @@ class PeerManager {
          * @return Vector of pairs of ip of peer with the file and a vector of bool denoting which
          * chunks are available
          */
-        std::vector<Peer> getPeersWithFile(std::string hash);
+        std::vector<std::pair<std::string, std::vector<bool>>> getPeersWithFile(std::string hash);
 
         /**
          * Find all distinct files (by hash) among all peers
          * @return Unordered set of FileInfo instances with unique hashes
          */
-        std::unordered_set<FileInfo, FileInfoHasher> getDistinctFiles();
+        std::vector<FileInfo> getDistinctFiles();
     private:
         std::vector<Peer> peerList;
 };

@@ -22,6 +22,10 @@ boost::optional<std::vector<bool>> Peer::checkForFile(std::string hash) {
     return boost::none;
 }
 
-const std::vector<FileInfo> Peer::getFileList() const {
+std::vector<FileInfo> Peer::getFileList() const {
     return this->fileList;
+}
+
+std::string Peer::getIp() const {
+    return ip;
 }

@@ -41,9 +41,14 @@ class Peer {
         boost::optional<std::vector<bool>> checkForFile(std::string hash);
 
         /**
+         * @return IP number of peer
+         */
+        std::string getIp() const;
+
+        /**
          * @return List of peers files as a vector of type FileInfo
          */
-        const std::vector<FileInfo> getFileList() const;
+        std::vector<FileInfo> getFileList() const;
 
     private:
         std::string ip;
