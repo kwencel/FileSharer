@@ -10,11 +10,16 @@ TrackerProtocolTranslator::TrackerProtocolTranslator() {
 std::string TrackerProtocolTranslator::generateResponse(char header, std::string message) {
     if (header == PROTOCOL_HEADER_REGISTER) {
         Peer newPeer = SerializationHelper::deserialize<Peer>(message);
-        peerManager.addPeer(newPeer); // TODO check ip and only update info if a peer with the same ip is already registered
-        LOG(INFO) << "Peer registered! IP: " + newPeer.getIp() + ", number of files: " + std::to_string(newPeer.getFileList().size());
-        LOG(INFO) << "Files:";
-        for (FileInfo fi : newPeer.getFileList()) {
-            LOG(INFO) << "Name: " + fi.getName() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
+        if (peerManager.addPeer(newPeer)) { // TODO tested on localhost - works but try to test again
+            LOG(INFO) << "Peer registered! IP: " + newPeer.getIp() + ", number of files: " +
+                         std::to_string(newPeer.getFileList().size());
+            LOG(INFO) << "Files:";
+            for (FileInfo fi : newPeer.getFileList()) {
+                LOG(INFO) << "Name: " + fi.getName() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
+            }
+        }
+        else {
+            LOG(INFO) << "Peer with IP: " + newPeer.getIp() + " already registered!";
         }
         char returnHeader = PROTOCOL_HEADER_REGISTER_ACCEPT;
         std::string response = SerializationHelper::serialize<std::string>(returnHeader, "");

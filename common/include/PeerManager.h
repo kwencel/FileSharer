@@ -17,7 +17,7 @@ class PeerManager {
          * Adds a Peer instance to the list of peers that tracker knows about
          * @param peer Instance of Peer to be added to tracker's peer list
          */
-        void addPeer(Peer peer);
+        bool addPeer(Peer peer);
 
         /**
          *
@@ -33,6 +33,7 @@ class PeerManager {
          */
         std::vector<FileInfo> getDistinctFiles();
     private:
+        boost::optional<Peer*> isPeerAdded(std::string ip);
         std::vector<Peer> peerList;
 };
 

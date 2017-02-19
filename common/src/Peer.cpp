@@ -35,3 +35,7 @@ std::vector<FileInfo> Peer::getFileList() const {
     return this->fileList;
 }
 
+void Peer::setFileList(std::vector<FileInfo> fileList) {
+    this->fileList = fileList;
+}
+

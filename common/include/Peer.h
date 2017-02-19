@@ -56,6 +56,8 @@ class Peer {
          */
         std::vector<FileInfo> getFileList() const;
 
+        void setFileList(std::vector<FileInfo> fileList);
+
     private:
         std::string ip;
         uint16_t port;

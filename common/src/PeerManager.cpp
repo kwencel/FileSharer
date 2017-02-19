@@ -1,11 +1,27 @@
 #include "PeerManager.h"
+#include <algorithm>
 
 PeerManager::PeerManager() {
 
 }
 
-void PeerManager::addPeer(Peer peer) {
-    this->peerList.push_back(peer);
+bool PeerManager::addPeer(Peer peer) {
+    boost::optional<Peer*> searchedForPeer = isPeerAdded(peer.getIp());
+    if (searchedForPeer) {
+        (*searchedForPeer)->setFileList(peer.getFileList());
+        return false;
+    }
+    else {
+        this->peerList.push_back(peer);
+        return true;
+    }
+}
+
+boost::optional<Peer*> PeerManager::isPeerAdded(std::string ip) {
+    for (Peer &p : peerList) {
+        if (p.getIp() == ip) return boost::optional<Peer*>(&p);
+    }
+    return boost::none;
 }
 
 std::vector<PeerFile> PeerManager::getPeersWithFile(std::string hash) {
