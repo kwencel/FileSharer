@@ -3,8 +3,11 @@
 #include <iostream>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
-#include "ConnectionManager.h"
+#include "include/ConnectionManager.h"
+#include <unistd.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocket.sin_family = AF_INET;
     ownSocket.sin_port = htons(bindPort);
@@ -12,6 +15,7 @@ ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     CHK_MSG(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)),
             std::string("ConnectionManager bind to " + getOwnIP() + ":" + std::to_string(getOwnPort())).c_str());
+    epollDescriptor = epoll_create(1);
 }
 
 ConnectionManager &ConnectionManager::getInstance(std::string bindIP, uint16_t bindPort) {
@@ -40,13 +44,13 @@ int ConnectionManager::getOwnSocketDescriptor() {
 
 void ConnectionManager::listenLoop() {
     CHK_MSG(listen(ownSocketDescriptor, 5), "ConnectionManager listen");
-    int peerSocketDescriptor;
-    sockaddr_in peerSocket {0};
-    socklen_t sizeOfPeerSocket = sizeof(peerSocket);
-    int enable = 1;
     std::thread([&]() {
-        while (std::cin) {
-            peerSocketDescriptor = accept(ownSocketDescriptor, (sockaddr *) &peerSocketDescriptor, &sizeOfPeerSocket);
+        int peerSocketDescriptor;
+        int enable = 1;
+        sockaddr_in peerSocket {0};
+        socklen_t sizeOfPeerSocket = sizeof(peerSocket);
+        while (true) {
+            peerSocketDescriptor = accept(ownSocketDescriptor, (sockaddr *) &peerSocket, &sizeOfPeerSocket);
             setsockopt(peerSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
             std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerSocketDescriptor, peerSocket);
             LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
@@ -58,7 +62,7 @@ void ConnectionManager::listenLoop() {
 }
 
 ConnectionManager::~ConnectionManager() {
-
+    close(epollDescriptor);
 }
 
 std::unordered_set<std::shared_ptr<Connection>> ConnectionManager::getActiveConnections() {
@@ -70,10 +74,33 @@ std::unordered_set<std::shared_ptr<Connection>> ConnectionManager::getActiveConn
 }
 
 std::shared_ptr<Connection> ConnectionManager::requestConnection(std::string peerIP, uint16_t peerPort) {
-    std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerIP, peerPort);
-    LOG(INFO) << "Created new connection to " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
+    std::shared_ptr<Connection> connection = std::make_shared<Connection>(peerIP, peerPort);
+    LOG(INFO) << "Created new connection to " << connection.get()->getPeerIP() << ":" << connection.get()->getPeerPort();
     connectionsMutex.lock();
-    connections.insert(conn);
+    connections.insert(connection);
     connectionsMutex.unlock();
-    return conn;
+    epoll_event epollEvent;
+    epollEvent.data.ptr = connection.get();
+    epollEvent.events = EPOLLIN;
+    epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection.get()->peerSocketDescriptor, &epollEvent);
+    return connection;
 }
+
+void ConnectionManager::processIncomingConnections() {
+    std::thread([&]() {
+        epoll_event epollEvent;
+        while (true) {
+            epoll_wait(epollDescriptor, &epollEvent, 1, -1);
+            static_cast<Connection *>(epollEvent.data.ptr)->notify();
+        }
+    }).detach();
+}
+
+void ConnectionManager::removeConnection(Connection *connection) {
+//    epoll_ctl(epollDescriptor, EPOLL_CTL_DEL, connection.get()->peerSocketDescriptor, )
+    connectionsMutex.lock();
+    connections.erase(std::shared_ptr<Connection>(connection)); // FIXME verify if it's working
+    connectionsMutex.unlock();
+}
+
+#pragma clang diagnostic pop

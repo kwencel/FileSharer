@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <easylogging++.h>
 #include <boost/filesystem/operations.hpp>
-#include <ConnectionManager.h>
+#include <include/ConnectionManager.h>
 #include <SerializationHelper.h>
 
 INITIALIZE_EASYLOGGINGPP

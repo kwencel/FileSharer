@@ -22,6 +22,7 @@ File::File(const std::string &name) {
             hash = calculateHashMD5(0, size);
         }
         LOG(INFO) << "File " << name << " with size " << size << "B opened";
+        fileHandler = std::make_unique<FileHandler>(this);
     } else {
         throw FileNotFoundError(name);
     }
@@ -36,6 +37,8 @@ File::File(const std::string &name, unsigned long size, std::string fileHash, st
     createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
     // TODO Preallocate file
+    fileHandler = std::make_unique<FileHandler>(this);
+
 }
 
 void File::verify() {
@@ -193,4 +196,14 @@ File::~File() {
     for (auto &&chunk : chunks) {
         delete chunk;
     }
+}
+
+std::vector<bool> File::getRemainingChunks() {
+    std::vector<bool> remainingChunks(getChunksAmount(), true);
+    for (int i = 0; i < getChunksAmount(); ++i) {
+        if (chunks[i]->isDownloaded()) {
+            remainingChunks[i] = false;
+        }
+    }
+    return remainingChunks;
 }

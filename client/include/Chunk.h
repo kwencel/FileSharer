@@ -1,7 +1,6 @@
 #ifndef FILESHARER_CHUNK_H
 #define FILESHARER_CHUNK_H
 
-
 #include <fstream>
 #include <File.h>
 

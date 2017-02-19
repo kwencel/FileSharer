@@ -1,18 +1,18 @@
-#ifndef FILESHARER_PROTOCOLTRANSLATOR_H
-#define FILESHARER_PROTOCOLTRANSLATOR_H
+#ifndef FILESHARER_TRACKERPROTOCOLTRANSLATOR_H
+#define FILESHARER_TRACKERPROTOCOLTRANSLATOR_H
 
 #include <string>
 #include "PeerManager.h"
 
-class ProtocolTranslator {
+class TrackerProtocolTranslator {
     public:
-        ProtocolTranslator();
+        TrackerProtocolTranslator();
         /**
          * Generates a response to a message received from a client
          * @param message Message read from socket
          * @return String response to be sent to client
          */
-        std::string generateResponse(char message[]);
+        std::string generateResponse(char header, std::string message);
 
         /**
          * Add peer to PeerManager (calls PeerManager::addPeer())
@@ -28,7 +28,7 @@ class ProtocolTranslator {
          * @param header Header of the message
          * @return String response to be sent to client
          */
-        std::string createResponse(std::string message);
+        std::string createResponse(char header, std::string message);
 };
 
 #endif //FILESHARER_PROTOCOLTRANSLATOR_H

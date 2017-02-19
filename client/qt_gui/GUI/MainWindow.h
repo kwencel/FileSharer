@@ -22,7 +22,6 @@ public:
 
 private:
         void scanLocalFiles();
-        void insertLocalFiles();
         Ui::MainWindow *ui;
         std::vector<File> localFiles;
 };

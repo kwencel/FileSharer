@@ -4,14 +4,16 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <AbstractFileHandler.h>
 #include <array>
 #include <Chunk.h>
 #include <Define.h>
+#include "FileHandler.h"
 
 class Chunk;
+class FileHandler;
 
 class File {
+    friend class FileHandler;
     public:
         /**
          * Constructs the File given the path. Reads file contents from disk.
@@ -30,6 +32,11 @@ class File {
              std::vector<std::string> chunksHashes);
 
         ~File();
+
+        /**
+         * Handles and issues requests concerning the file.
+         */
+        std::unique_ptr<FileHandler> fileHandler;
 
         /**
          * @return Amount of chunks the file was divided to.
@@ -86,9 +93,9 @@ class File {
          * @return Vector of chunks hashes
          */
         std::vector<std::string> getChunksHashes();
+        std::vector<bool> getRemainingChunks();
 
-        File(File &&) = default;
-        File(const File&) = default;
+        File(File&&) = default;
 
     private:
         std::string name;
@@ -96,7 +103,6 @@ class File {
         uintmax_t size;
         std::vector<Chunk *> chunks;
         std::fstream fileStream;
-        AbstractFileHandler *fileHandler;
 
         /**
          * Reads file data from disk.

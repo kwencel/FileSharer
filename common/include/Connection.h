@@ -4,11 +4,17 @@
 
 #include <netinet/in.h>
 #include <string>
+#include <vector>
 #include <Define.h>
+#include <forward_list>
+#include "../../client/include/Observer.h"
+//TODO change CMakeLists to include this with just the header name
 
 class ConnectionManager;
+//class Observer;
 
 class Connection {
+    friend class ConnectionManager;
     public:
         /**
          * Constructs an outgoing connection
@@ -44,14 +50,20 @@ class Connection {
          * @param data Information to be sent
          * @return Number of bytes that was sent
          */
-        ssize_t send(std::string data);
+        ssize_t write(std::string data);
 
         /**
          * Receives data from peer
          * @param howMany Number of bytes to be read
          * @return Received information
          */
-        std::string receive(size_t howMany = RECEIVE_BUFFER);
+        std::string read(size_t howMany = RECEIVE_BUFFER);
+
+        void notify();
+
+        void registerObserver(Observer *observer);
+
+        void unregisterObserver(Observer *observer);
 
     private:
         /**
@@ -63,6 +75,8 @@ class Connection {
          * Descriptor of peer's socket used for communication
          */
         int peerSocketDescriptor;
+
+        std::forward_list<class Observer *> observers;
 };
 
 

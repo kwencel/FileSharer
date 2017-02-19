@@ -1,12 +1,12 @@
 #ifndef FILESHARER_CONNECTIONMANAGER_H
 #define FILESHARER_CONNECTIONMANAGER_H
 
-
 #include <netinet/in.h>
 #include <string>
 #include <mutex>
 #include <thread>
 #include <unordered_set>
+#include <sys/epoll.h>
 #include "Connection.h"
 
 class ConnectionManager {
@@ -19,7 +19,13 @@ class ConnectionManager {
         int getOwnSocketDescriptor();
         std::unordered_set<std::shared_ptr<Connection>> getActiveConnections();
         std::shared_ptr<Connection> requestConnection(std::string peerIP, uint16_t peerPort);
+        void removeConnection(Connection *connection);
+
+        /**
+         * Adds new connections to @a connections set.
+         */
         void listenLoop();
+        void processIncomingConnections();
 
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);
@@ -33,6 +39,7 @@ class ConnectionManager {
         ConnectionManager() = delete;
         ConnectionManager(const ConnectionManager &) = delete;
 //        ConnectionManager& operator=(const ConnectionManager&) = delete;
+        int epollDescriptor;
 };
 
 

@@ -5,7 +5,6 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <string>
 #include <vector>
-#include "../../client/include/File.h"
 
 class FileInfo {
     public:
@@ -17,7 +16,6 @@ class FileInfo {
          * @param availableChunks Vector of bool values denoting which chunks of the file are available
          */
         FileInfo(const std::string filename, const std::string hash, std::vector<bool> availableChunks);
-        FileInfo(File file);
         FileInfo();
 
         friend class boost::serialization::access;

@@ -1,6 +1,6 @@
 #include <SerializationHelper.h>
 #include <easylogging++.h>
-#include <ConnectionManager.h>
+#include <include/ConnectionManager.h>
 #include <FileInfo.h>
 #include <boost/filesystem.hpp>
 #include <Peer.h>
@@ -42,53 +42,12 @@ void MainWindow::scanLocalFiles() {
             }
         }
     }
-    this->insertLocalFiles();
-}
-
-void MainWindow::insertLocalFiles() {
-    ui->downloadingFilesTableWidget->setRowCount(0);
-    int row = 0;
-    for (File &file : this->localFiles) {
-        ui->downloadingFilesTableWidget->insertRow(row);
-        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
-        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
-        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(file.getRealSize())));
-        ui->downloadingFilesTableWidget->setItem(row, 0, name);
-        ui->downloadingFilesTableWidget->setItem(row, 1, hash);
-        ui->downloadingFilesTableWidget->setItem(row, 2, size);
-        ++row;
-    }
 }
 
 void MainWindow::getAvailableFilesButtonClicked() {
-    std::shared_ptr<Connection> conn = ConnectionManager::getInstance().requestConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-    char header = PROTOCOL_HEADER_LIST_FILES;
-    std::string serialized = SerializationHelper::serialize<char>(header);
-    conn.get()->send(serialized);
-    std::string response = conn.get()->receive();
-    std::vector<FileInfo> fileInfoVector = SerializationHelper::deserialize<std::vector<FileInfo>>(response);
 
-    ui->availableFilesTableWidget->setRowCount(0);
-    int row = 0;
-    for (FileInfo &fileInfo : fileInfoVector) {
-        ui->availableFilesTableWidget->insertRow(row);
-        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getFilename()));
-        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));
-        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(fileInfo.getAvailableChunks().size() * CHUNK_SIZE)));
-        ui->availableFilesTableWidget->setItem(row, 0, name);
-        ui->availableFilesTableWidget->setItem(row, 1, hash);
-        ui->availableFilesTableWidget->setItem(row, 2, size);
-        ++row;
-    }
 }
 
 void MainWindow::informTrackerButtonClicked() {
-    std::shared_ptr<Connection> conn = ConnectionManager::getInstance().requestConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-    char header = PROTOCOL_HEADER_REGISTER;
-    FileInfo fi("nazwa", "hash", std::vector<bool>{1,1,1,0,0,0});
-    Peer p("127.0.0.1", std::vector<FileInfo>{fi});
-    LOG(INFO) << "Sending header: " + std::to_string(header);
-    std::string serialized = SerializationHelper::serialize<Peer>(header, p);
-    conn.get()->send(serialized);
-    std::cout << conn.get()->receive();
+
 }

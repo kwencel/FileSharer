@@ -6,6 +6,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/unordered_set.hpp>
 #include <boost/serialization/utility.hpp>
+#include <ProtocolUtils.h>
 
 namespace SerializationHelper {
 
@@ -16,24 +17,19 @@ namespace SerializationHelper {
      * @return Serialized object in the form of std::string
      */
     template<typename T>
-    static std::string serialize(T object) {
-        std::ostringstream archive_stream;
-        {
-            boost::archive::text_oarchive archive(archive_stream);
-            archive << object;
-        }
-        return archive_stream.str();
-    }
-
-    template<typename T>
     static std::string serialize(char header, T object) {
+        std::string headerAsString = ProtocolUtils::encodeHeader(header);
         std::ostringstream archive_stream;
         {
             boost::archive::text_oarchive archive(archive_stream);
-            archive << header;
             archive << object;
         }
-        return archive_stream.str();
+        uint64_t serializedStringSize = (uint64_t) archive_stream.str().size();
+        std::string sizeAsString = ProtocolUtils::encodeSize(serializedStringSize);
+        //LOG(DEBUG) << "Header + size size: " + std::to_string(headerAsString.size() + sizeAsString.size());
+        //LOG(DEBUG) << "Object size " + std::to_string(serializedStringSize);
+
+        return (headerAsString + sizeAsString + archive_stream.str());
     }
 
     /**
@@ -42,26 +38,13 @@ namespace SerializationHelper {
      * @param serializedObject String to deserialize
      * @return Deserialized object of type T
      */
-    static char deserializeHeader(std::string &serializedObject) {
-        char header;
-        std::stringstream archive_stream;
-        archive_stream << serializedObject;
-        {
-            boost::archive::text_iarchive archive(archive_stream);
-            archive >> header;
-        }
-        return header;
-    }
-
     template<typename T>
     static T deserialize(std::string &serializedObject) {
-        char header;
         T deserializedObject;
         std::stringstream archive_stream;
         archive_stream << serializedObject;
         {
             boost::archive::text_iarchive archive(archive_stream);
-            archive >> header;
             archive >> deserializedObject;
         }
         return deserializedObject;
