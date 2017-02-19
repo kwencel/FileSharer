@@ -16,24 +16,17 @@ namespace SerializationHelper {
      * @return Serialized object in the form of std::string
      */
     template<typename T>
-    static std::string serialize(T object) {
-        std::ostringstream archive_stream;
-        {
-            boost::archive::text_oarchive archive(archive_stream);
-            archive << object;
-        }
-        return archive_stream.str();
-    }
-
-    template<typename T>
     static std::string serialize(char header, T object) {
+        std::string headerAsString(&header, 1);
         std::ostringstream archive_stream;
         {
             boost::archive::text_oarchive archive(archive_stream);
-            archive << header;
             archive << object;
         }
-        return archive_stream.str();
+        uint64_t serializedStringSize = (uint64_t) archive_stream.str().size();
+        std::string sizeAsString((char*) &serializedStringSize, 8);
+
+        return (headerAsString + sizeAsString + sizeAsString);
     }
 
     /**
@@ -42,26 +35,13 @@ namespace SerializationHelper {
      * @param serializedObject String to deserialize
      * @return Deserialized object of type T
      */
-    static char deserializeHeader(std::string &serializedObject) {
-        char header;
-        std::stringstream archive_stream;
-        archive_stream << serializedObject;
-        {
-            boost::archive::text_iarchive archive(archive_stream);
-            archive >> header;
-        }
-        return header;
-    }
-
     template<typename T>
     static T deserialize(std::string &serializedObject) {
-        char header;
         T deserializedObject;
         std::stringstream archive_stream;
         archive_stream << serializedObject;
         {
             boost::archive::text_iarchive archive(archive_stream);
-            archive >> header;
             archive >> deserializedObject;
         }
         return deserializedObject;

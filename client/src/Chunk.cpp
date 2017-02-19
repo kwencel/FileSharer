@@ -31,6 +31,7 @@ void Chunk::setData(std::vector<char> data) {
         throw ChunkHashMismatchError(hash, calculatedHash);
     }
     this->data = data;
+    this->downloaded = true;
     associatedFile->notifyChunkDownloaded(id);
 }
 
