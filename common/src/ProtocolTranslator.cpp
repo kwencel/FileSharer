@@ -7,21 +7,16 @@ ProtocolTranslator::ProtocolTranslator() {
 
 }
 
-std::string ProtocolTranslator::generateResponse(char message[]) {
-    std::string stringMessage = std::string(message);
-    return createResponse(stringMessage);
+std::string ProtocolTranslator::generateResponse(char header, std::string message) {
+    return createResponse(header, message);
 }
 
 void ProtocolTranslator::addPeer(Peer peer) {
     this->peerManager.addPeer(peer);
 }
 
-std::string ProtocolTranslator::createResponse(std::string message) {
-    LOG(INFO) << "Message: " + message;
-    char headerByte = SerializationHelper::deserializeHeader(message);
-    LOG(INFO) << "Incoming header: " + std::to_string(headerByte);
-
-    if (headerByte == PROTOCOL_HEADER_REGISTER) {
+std::string ProtocolTranslator::createResponse(char header, std::string message) {
+    if (header == PROTOCOL_HEADER_REGISTER) {
         Peer newPeer = SerializationHelper::deserialize<Peer>(message);
         peerManager.addPeer(newPeer); // TODO check ip and only update info if a peer with the same ip is already registered
         LOG(INFO) << "Peer registered! IP: " + newPeer.getIp() + ", number of files: " + std::to_string(newPeer.getFileList().size());
@@ -29,17 +24,20 @@ std::string ProtocolTranslator::createResponse(std::string message) {
         for (FileInfo fi : newPeer.getFileList()) {
             LOG(INFO) << "Name: " + fi.getFilename() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
         }
-        return "SUCCESS\n";
+        char returnHeader = PROTOCOL_HEADER_REGISTER_ACCEPT;
+        std::string response = SerializationHelper::serialize<std::string>(returnHeader, "");
+        LOG(INFO) << "Response size: " + std::to_string(response.size());
+        return response;
     }
-    else if (headerByte == PROTOCOL_HEADER_PEERS_WITH_FILE) {
+    else if (header == PROTOCOL_HEADER_PEERS_WITH_FILE) {
         std::string hash = SerializationHelper::deserialize<std::string>(message);
         std::vector<std::pair<std::string, std::vector<bool>>> peers = peerManager.getPeersWithFile(hash);
-        std::string peerInfo = SerializationHelper::serialize<std::vector<std::pair<std::string, std::vector<bool>>>>(peers);
+        std::string peerInfo = SerializationHelper::serialize<std::vector<std::pair<std::string, std::vector<bool>>>>(header, peers);
         return peerInfo;
     }
-    else if (headerByte == PROTOCOL_HEADER_LIST_FILES) {
+    else if (header == PROTOCOL_HEADER_LIST_FILES) {
         std::vector<FileInfo> distinctFiles = peerManager.getDistinctFiles();
-        std::string distinctFilesInfo = SerializationHelper::serialize<std::vector<FileInfo>>(distinctFiles);
+        std::string distinctFilesInfo = SerializationHelper::serialize<std::vector<FileInfo>>(header, distinctFiles);
         return distinctFilesInfo;
     }
     else return "WRONG HEADER\n";

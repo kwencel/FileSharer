@@ -2,8 +2,8 @@
 #define FILESHARER_FILEHANDLER_H
 
 
-#include <Observer.h>
-#include <Connection.h>
+#include "Observer.h"
+#include "Connection.h"
 #include <memory>
 #include <unordered_set>
 #include <map>

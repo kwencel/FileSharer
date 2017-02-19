@@ -10,4 +10,4 @@ include_directories(include)
 
 add_executable(tracker ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES})
 
-target_link_libraries(tracker ${Boost_LIBRARIES})
+target_link_libraries(tracker ${Boost_LIBRARIES} Threads::Threads)

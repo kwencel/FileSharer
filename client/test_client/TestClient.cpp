@@ -1,7 +1,8 @@
 #include <easylogging++.h>
 #include <boost/filesystem/operations.hpp>
-#include <ConnectionManager.h>
+#include "ConnectionManager.h"
 #include <SerializationHelper.h>
+#include <Peer.h>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -44,11 +45,20 @@ int main() {
 
     ConnectionManager &cm = ConnectionManager::getInstance("127.0.0.1", 2050);
 //    cm.listenLoop();
-    auto conn = cm.requestConnection("127.0.0.1", 2048);
+    auto conn = cm.requestConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
     uint32_t number = 2534625;
 
-    std::string liczba((char*)&number, 4);
-    conn.get()->write(liczba);
+    char header = PROTOCOL_HEADER_REGISTER;
+    FileInfo fi("nazwa", "hash", std::vector<bool>{1,1,1,0,0,0});
+    Peer p("127.0.0.1", std::vector<FileInfo>{fi});
+    LOG(INFO) << "Sending header: " + std::to_string(header);
+    std::string serialized = SerializationHelper::serialize<Peer>(header, p);
+    conn.get()->write(serialized);
+    std::string request = conn.get()->read(9);
+    header = *(char *)(request.c_str());
+    LOG(INFO) << "Received header: " + std::to_string(header);
+    if (header == PROTOCOL_HEADER_REGISTER_ACCEPT)
+        std::cout << "SUCCESS!\n" << std::endl;
 
     while(1);
 

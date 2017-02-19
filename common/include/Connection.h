@@ -7,7 +7,8 @@
 #include <vector>
 #include <Define.h>
 #include <forward_list>
-#include "Observer.h"
+#include "../../client/include/Observer.h"
+//TODO change CMakeLists to include this with just the header name
 
 class ConnectionManager;
 //class Observer;
