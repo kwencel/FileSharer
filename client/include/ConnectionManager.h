@@ -27,7 +27,8 @@ class ConnectionManager {
          */
         void listenLoop();
         void processIncomingConnections();
-        std::vector<std::unique_ptr<File>> files;
+
+        std::vector<FileHandler> fileHandlers;
 
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);

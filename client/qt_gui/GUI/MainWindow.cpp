@@ -1,7 +1,6 @@
 #include <SerializationHelper.h>
 #include <easylogging++.h>
 #include <ConnectionManager.h>
-#include <FileInfo.h>
 #include <boost/filesystem.hpp>
 #include <Peer.h>
 #include "MainWindow.h"
@@ -18,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
     header = ui->availableFilesTableWidget->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
 
-    this->scanLocalFiles();
+//    cm.fileHandlers = this->scanLocalFiles();
+//    cm.listenLoop();
 }
 
 MainWindow::~MainWindow()
@@ -26,11 +26,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::scanLocalFiles() {
+std::vector<FileHandler> MainWindow::scanLocalFiles() {
     namespace fs = boost::filesystem;
     fs::path fullPath(fs::current_path());
     fullPath /= "files";
     fs::directory_iterator end_iter;
+
+    std::vector<FileHandler> fileHandlers;
 
     if (fs::exists(fullPath) && fs::is_directory(fullPath)) {
         for(fs::directory_iterator dirIter(fullPath);dirIter != end_iter;++dirIter)
@@ -38,41 +40,48 @@ void MainWindow::scanLocalFiles() {
             LOG(INFO) << dirIter->path().string();
             if (fs::is_regular_file(dirIter->status()) )
             {
-                File newFile = File(dirIter->path().string());
-                //localFileHandlers.emplace_back(FileHandler(&newFile));
+                std::string path = dirIter->path().string();
+                fileHandlers.emplace_back(path);
             }
         }
     }
-    this->insertLocalFiles();
+    return fileHandlers;
 }
 
-void MainWindow::insertLocalFiles() {
-    ui->downloadingFilesTableWidget->setRowCount(0);
-    int row = 0;
-    for (FileHandler &fileHandler : this->localFileHandlers) {
-        File &file = *fileHandler.file;
-        ui->downloadingFilesTableWidget->insertRow(row);
-        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
-        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
-        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(file.getRealSize())));
-        ui->downloadingFilesTableWidget->setItem(row, 0, name);
-        ui->downloadingFilesTableWidget->setItem(row, 1, hash);
-        ui->downloadingFilesTableWidget->setItem(row, 2, size);
-        ++row;
-    }
-}
+//void MainWindow::insertLocalFiles() {
+//    ui->downloadingFilesTableWidget->setRowCount(0);
+//    int row = 0;
+//    for (FileHandler &fileHandler : this->cm.fileHandlers) {
+//        File &file = *fileHandler.file;
+//        ui->downloadingFilesTableWidget->insertRow(row);
+//        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
+//        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
+//        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(file.getRealSize())));
+//        ui->downloadingFilesTableWidget->setItem(row, 0, name);
+//        ui->downloadingFilesTableWidget->setItem(row, 1, hash);
+//        ui->downloadingFilesTableWidget->setItem(row, 2, size);
+//        ++row;
+//    }
+//}
+
+//std::vector<FileInfo> MainWindow::getLocalFileInfos() {
+//    std::vector<FileInfo> fileInfos;
+//    for (FileHandler &fileHandler : this->cm.fileHandlers) {
+//        File &file = *fileHandler.file;
+//        fileInfos.emplace_back(FileInfo(file.getName(), file.getHash(), file.getDownloadedChunks()));
+//    }
+//    return fileInfos;
+//}
+
 
 void MainWindow::informTrackerButtonClicked() {
-    /*std::shared_ptr<Connection> conn = ConnectionManager::getInstance().requestConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+    //std::vector<FileInfo> fileInfos = this->getLocalFileInfos();
+    Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
     char header = PROTOCOL_HEADER_REGISTER;
-    FileInfo fi("nazwa", "hash", std::vector<bool>{1,1,1,0,0,0});
-    Peer p("127.0.0.1", std::vector<FileInfo>{fi});
-    LOG(INFO) << "Sending header: " + std::to_string(header);
-    std::string serialized = SerializationHelper::serialize<Peer>(header, p);
-    conn.get()->send(serialized);
-    std::cout << conn.get()->receive();*/
+    //std::string message = ClientProtocolTranslator::generateMessage<>()
 }
 
 void MainWindow::getAvailableFilesButtonClicked() {
 
 }
+

@@ -8,14 +8,6 @@ TrackerProtocolTranslator::TrackerProtocolTranslator() {
 }
 
 std::string TrackerProtocolTranslator::generateResponse(char header, std::string message) {
-    return createResponse(header, message);
-}
-
-void TrackerProtocolTranslator::addPeer(Peer peer) {
-    this->peerManager.addPeer(peer);
-}
-
-std::string TrackerProtocolTranslator::createResponse(char header, std::string message) {
     if (header == PROTOCOL_HEADER_REGISTER) {
         Peer newPeer = SerializationHelper::deserialize<Peer>(message);
         peerManager.addPeer(newPeer); // TODO check ip and only update info if a peer with the same ip is already registered

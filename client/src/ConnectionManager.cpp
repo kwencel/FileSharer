@@ -4,7 +4,6 @@
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
 #include "include/ConnectionManager.h"
-#include <unistd.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -46,9 +45,9 @@ bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection>
     std::string header = connection.get()->read(1);
     if (header[0] == PROTOCOL_PEER_INIT_HASH) {
         std::string fileHash = connection.get()->read(32);
-        for (auto &&file : files) {
-            if (file.get()->getHash() == fileHash) {
-                file.get()->fileHandler.get()->addConnection(connection);
+        for (auto &&fileHandler : fileHandlers) {
+            if (fileHandler.file->getHash() == fileHash) {
+                fileHandler.addConnection(connection);
                 epoll_event epollEvent;
                 epollEvent.data.ptr = connection.get();
                 epollEvent.events = EPOLLIN;

@@ -88,7 +88,10 @@ class File {
          * @return Vector of chunks hashes
          */
         std::vector<std::string> getChunksHashes();
-        std::vector<bool> getRemainingChunks();
+
+        std::vector<bool> getDownloadedChunks();
+
+        FileInfo getFileInfo();
 
         File(File&&) = default;
 

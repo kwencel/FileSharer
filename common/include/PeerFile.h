@@ -8,6 +8,7 @@
 class PeerFile {
     public:
         PeerFile(std::string ip, uint16_t port, std::vector<bool> availableChunks);
+        PeerFile();
         friend class boost::serialization::access;
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)

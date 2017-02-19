@@ -210,12 +210,16 @@ File::~File() {
     }
 }
 
-std::vector<bool> File::getRemainingChunks() {
-    std::vector<bool> remainingChunks(getChunksAmount(), true);
+std::vector<bool> File::getDownloadedChunks() {
+    std::vector<bool> remainingChunks(getChunksAmount(), false);
     for (int i = 0; i < getChunksAmount(); ++i) {
         if (chunks[i]->isDownloaded()) {
-            remainingChunks[i] = false;
+            remainingChunks[i] = true;
         }
     }
     return remainingChunks;
+}
+
+FileInfo File::getFileInfo() {
+    return FileInfo(getName(), getHash(), getDownloadedChunks());
 }

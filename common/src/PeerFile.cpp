@@ -6,6 +6,10 @@ PeerFile::PeerFile(std::string ip, uint16_t port, std::vector<bool> availableChu
     this->availableChunks = availableChunks;
 }
 
+PeerFile::PeerFile() {
+
+}
+
 std::string PeerFile::getIp() const {
     return this->ip;
 }
