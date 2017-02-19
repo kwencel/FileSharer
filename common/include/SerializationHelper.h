@@ -25,8 +25,8 @@ namespace SerializationHelper {
         }
         uint64_t serializedStringSize = (uint64_t) archive_stream.str().size();
         std::string sizeAsString((char*) &serializedStringSize, 8);
-        LOG(DEBUG) << "Header + size size: " + std::to_string(headerAsString.size() + sizeAsString.size());
-        LOG(DEBUG) << "Object size " + std::to_string(serializedStringSize);
+        //LOG(DEBUG) << "Header + size size: " + std::to_string(headerAsString.size() + sizeAsString.size());
+        //LOG(DEBUG) << "Object size " + std::to_string(serializedStringSize);
 
         return (headerAsString + sizeAsString + archive_stream.str());
     }
