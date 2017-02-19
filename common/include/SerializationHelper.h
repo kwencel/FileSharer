@@ -6,6 +6,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/unordered_set.hpp>
 #include <boost/serialization/utility.hpp>
+#include <ProtocolUtils.h>
 
 namespace SerializationHelper {
 
@@ -17,14 +18,14 @@ namespace SerializationHelper {
      */
     template<typename T>
     static std::string serialize(char header, T object) {
-        std::string headerAsString(&header, 1);
+        std::string headerAsString = ProtocolUtils::encodeHeader(header);
         std::ostringstream archive_stream;
         {
             boost::archive::text_oarchive archive(archive_stream);
             archive << object;
         }
         uint64_t serializedStringSize = (uint64_t) archive_stream.str().size();
-        std::string sizeAsString((char*) &serializedStringSize, 8);
+        std::string sizeAsString = ProtocolUtils::encodeSize(serializedStringSize);
         //LOG(DEBUG) << "Header + size size: " + std::to_string(headerAsString.size() + sizeAsString.size());
         //LOG(DEBUG) << "Object size " + std::to_string(serializedStringSize);
 
