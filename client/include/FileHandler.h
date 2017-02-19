@@ -18,9 +18,9 @@ class FileHandler : public Observer {
         //        vector<pair<string(ip), vector<chunk>>
         void startDownload(std::vector<std::pair<std::string, std::vector<bool>>> peers);
         void download();
+        File *file;
 
     private:
-        File *file;
         /**
          * Stores connections to peers that has some chunks of the file
          * key: IP of the connected peer

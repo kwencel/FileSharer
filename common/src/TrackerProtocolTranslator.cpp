@@ -31,8 +31,8 @@ std::string TrackerProtocolTranslator::createResponse(char header, std::string m
     }
     else if (header == PROTOCOL_HEADER_PEERS_WITH_FILE) {
         std::string hash = SerializationHelper::deserialize<std::string>(message);
-        std::vector<std::pair<std::string, std::vector<bool>>> peers = peerManager.getPeersWithFile(hash);
-        std::string peerInfo = SerializationHelper::serialize<std::vector<std::pair<std::string, std::vector<bool>>>>(header, peers);
+        std::vector<PeerFile> peers = peerManager.getPeersWithFile(hash);
+        std::string peerInfo = SerializationHelper::serialize<std::vector<PeerFile>>(header, peers);
         return peerInfo;
     }
     else if (header == PROTOCOL_HEADER_LIST_FILES) {

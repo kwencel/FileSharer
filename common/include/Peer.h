@@ -29,6 +29,7 @@ class Peer {
         void serialize(Archive & ar, const unsigned int version)
         {
             ar & ip;
+            ar & port;
             ar & fileList;
         }
 
@@ -46,12 +47,18 @@ class Peer {
         std::string getIp() const;
 
         /**
+         * @return Port number of peer
+         */
+        uint16_t getPort() const;
+
+        /**
          * @return List of peers files as a vector of type FileInfo
          */
         std::vector<FileInfo> getFileList() const;
 
     private:
         std::string ip;
+        uint16_t port;
         std::vector<FileInfo> fileList;
 
 };
