@@ -4,21 +4,13 @@
 #include <string>
 
 namespace ProtocolUtils {
-    std::string encodeHeader(char number) {
-        return std::string(&number, 1);
-    }
+    std::string encodeHeader(char number);
 
-    std::string encodeSize(uint64_t number) {
-        return std::string((char*) &number, 8);
-    }
+    std::string encodeSize(uint64_t number);
 
-    char decodeHeader(std::string encodedNumber) {
-        return (*(char *)(encodedNumber.c_str()));
-    }
+    char decodeHeader(std::string encodedNumber);
 
-    uint64_t decodeSize(std::string encodedNumber) {
-        return (*(uint64_t *)(encodedNumber.c_str()));
-    }
+    uint64_t decodeSize(std::string encodedNumber);
 }
 
 #endif //FILESHARER_PROTOCOLUTILS_H
