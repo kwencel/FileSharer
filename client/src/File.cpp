@@ -32,12 +32,13 @@ File::File(const std::string &name, unsigned long size, std::string fileHash, st
     this->name = name;
     this->size = size;
     this->hash = fileHash;
+    fileHandler = std::make_unique<FileHandler>(this);
+//    fileHandler // TODO Download chunksHashes;
     fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
     createChunks(chunksHashes);
     createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
     // TODO Preallocate file
-    fileHandler = std::make_unique<FileHandler>(this);
 
 }
 

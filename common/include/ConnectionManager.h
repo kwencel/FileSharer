@@ -8,6 +8,7 @@
 #include <thread>
 #include <unordered_set>
 #include <sys/epoll.h>
+#include <File.h>
 #include "Connection.h"
 
 class ConnectionManager {
@@ -27,6 +28,7 @@ class ConnectionManager {
          */
         void listenLoop();
         void processIncomingConnections();
+        std::vector<std::unique_ptr<File>> files;
 
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);
@@ -41,6 +43,8 @@ class ConnectionManager {
         ConnectionManager(const ConnectionManager &) = delete;
 //        ConnectionManager& operator=(const ConnectionManager&) = delete;
         int epollDescriptor;
+
+        bool notifyFileAboutNewConnection(std::shared_ptr<Connection> connection);
 };
 
 
