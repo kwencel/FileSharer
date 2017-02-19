@@ -48,6 +48,9 @@
     </item>
     <item row="3" column="0" colspan="3">
      <widget class="QTableWidget" name="availableFilesTableWidget">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
       <column>
        <property name="text">
         <string>Filename</string>
@@ -184,9 +187,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>availableFilesTableWidget</sender>
+   <signal>cellDoubleClicked(int,int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>trackerFileRowDoubleClicked(int,int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>424</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>getAvailableFilesButtonClicked()</slot>
   <slot>informTrackerButtonClicked()</slot>
+  <slot>trackerFileRowDoubleClicked(int,int)</slot>
  </slots>
 </ui>

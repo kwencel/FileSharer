@@ -22,6 +22,7 @@ public:
     private slots:
         void getAvailableFilesButtonClicked();
         void informTrackerButtonClicked();
+        void trackerFileRowDoubleClicked(int row, int column);
 
 private:
         std::vector<FileHandler> scanLocalFiles();

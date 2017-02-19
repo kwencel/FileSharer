@@ -49,8 +49,8 @@ int main() {
     uint32_t number = 2534625;
 
     char header = PROTOCOL_HEADER_REGISTER;
-    FileInfo fi("nazwa", "hash", std::vector<bool>{1,1,1,0,0,0});
-    Peer p("127.0.0.1", std::vector<FileInfo>{fi});
+    FileInfo fi("nazwa", "hash", 10, std::vector<bool>{1,1,1,0,0,0});
+    Peer p("127.0.0.1", 2500, std::vector<FileInfo>{fi});
     LOG(INFO) << "Sending header: " + std::to_string(header);
     std::string serialized = SerializationHelper::serialize<Peer>(header, p);
     conn.get()->write(serialized);

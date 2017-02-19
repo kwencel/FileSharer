@@ -112,3 +112,7 @@ void MainWindow::getAvailableFilesButtonClicked() {
     }
 }
 
+void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
+    LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
+}
+
