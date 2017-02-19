@@ -35,9 +35,20 @@ add_executable(client ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${C
                ${QT_SOURCE_FILES} ${QT_HEADER_FILES} ${QT_GEN_SOURCE} ${QT_GEN_HEADERS})
 
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Client.cpp")
+
 add_executable(test_client test_client/TestClient.cpp ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES}
         ${QT_SOURCE_FILES} ${QT_HEADER_FILES} ${QT_GEN_SOURCE} ${QT_GEN_HEADERS})
 
+add_executable(test_client2 test_client2/TestClient2.cpp ${SOURCE_FILES} ${HEADER_FILES} ${COMMON_SOURCE_FILES} ${COMMON_HEADER_FILES}
+        ${QT_SOURCE_FILES} ${QT_HEADER_FILES} ${QT_GEN_SOURCE} ${QT_GEN_HEADERS})
+
+#set_target_properties(
+#        test_client2
+#        PROPERTIES
+#        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build
+#)
+
 
 target_link_libraries(client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} Threads::Threads Qt5::Core Qt5::Widgets Qt5::Gui)
+target_link_libraries(test_client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} Threads::Threads Qt5::Core Qt5::Widgets Qt5::Gui)
 target_link_libraries(test_client ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} Threads::Threads Qt5::Core Qt5::Widgets Qt5::Gui)

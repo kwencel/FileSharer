@@ -53,6 +53,10 @@ std::string Connection::read(size_t howMany) {
         }
         // TODO Add timeout
         readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
+        if (readBytes == -1) {
+            perror("Error during read in Connection");
+            throw std::runtime_error("Error during read in Connection");
+        }
         howMany -= readBytes;
         if (howMany < 0) {
             LOG(DEBUG) << "Read returned more than expected";

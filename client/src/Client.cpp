@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <easylogging++.h>
 #include <boost/filesystem/operations.hpp>
-#include <include/ConnectionManager.h>
 #include <SerializationHelper.h>
 
 INITIALIZE_EASYLOGGINGPP
@@ -17,6 +16,8 @@ int main(int argc, char *argv[]) {
 //    for (unsigned long i = 0; i < kopia.getChunksAmount(); ++i) {
 //        kopiaChunks[i]->setData(sinewave.readChunkData(i));
 //    }
+
+    ConnectionManager &cm = ConnectionManager::getInstance("127.0.0.1", atoi(*argv));
 
     std::cout << QT_VERSION_STR;
     QApplication a(argc, argv);

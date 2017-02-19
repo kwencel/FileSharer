@@ -3,7 +3,7 @@
 #include <ConnectionManager.h>
 #include <boost/filesystem.hpp>
 #include <Peer.h>
-#include <include/ClientProtocolTranslator.h>
+#include <ClientProtocolTranslator.h>
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     header = ui->availableFilesTableWidget->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
 
-    cm.fileHandlers = this->scanLocalFiles();
+    cm.fileHandlers = this->scanLocalFiles(); // FIXME Pass by reference!!!
     insertLocalFiles();
     cm.listenLoop();
 }
@@ -28,13 +28,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-std::vector<FileHandler> MainWindow::scanLocalFiles() {
+std::vector<std::shared_ptr<FileHandler>> MainWindow::scanLocalFiles() {
     namespace fs = boost::filesystem;
     fs::path fullPath(fs::current_path());
     fullPath /= "files";
     fs::directory_iterator end_iter;
 
-    std::vector<FileHandler> fileHandlers;
+    std::vector<std::shared_ptr<FileHandler>> fileHandlers;
 
     if (fs::exists(fullPath) && fs::is_directory(fullPath)) {
         for(fs::directory_iterator dirIter(fullPath);dirIter != end_iter;++dirIter)
@@ -43,7 +43,7 @@ std::vector<FileHandler> MainWindow::scanLocalFiles() {
             if (fs::is_regular_file(dirIter->status()) )
             {
                 std::string path = dirIter->path().string();
-                fileHandlers.emplace_back(path);
+                fileHandlers.emplace_back(std::make_shared<FileHandler>(path));
             }
         }
     }
@@ -53,8 +53,8 @@ std::vector<FileHandler> MainWindow::scanLocalFiles() {
 void MainWindow::insertLocalFiles() {
     ui->downloadingFilesTableWidget->setRowCount(0);
     int row = 0;
-    for (FileHandler &fileHandler : this->cm.fileHandlers) {
-        File &file = *fileHandler.file;
+    for (auto fileHandler : this->cm.fileHandlers) {
+        File &file = *fileHandler.get()->file;
         ui->downloadingFilesTableWidget->insertRow(row);
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
         QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
@@ -68,8 +68,8 @@ void MainWindow::insertLocalFiles() {
 
 std::vector<FileInfo> MainWindow::getLocalFileInfos() {
     std::vector<FileInfo> fileInfos;
-    for (FileHandler &fileHandler : this->cm.fileHandlers) {
-        File &file = *fileHandler.file;
+    for (auto fileHandler : this->cm.fileHandlers) {
+        File &file = *fileHandler.get()->file;
         fileInfos.emplace_back(file.getFileInfo());
     }
     return fileInfos;
@@ -94,12 +94,12 @@ void MainWindow::getAvailableFilesButtonClicked() {
     header = ProtocolUtils::decodeHeader(first.substr(0, 1));
     uint64_t  size = ProtocolUtils::decodeSize(first.substr(1, 8));
     std::string response = conn.read(size);
-    std::vector<FileInfo> fileInfos = ClientProtocolTranslator::decodeMessage<std::vector<FileInfo>>(response);
+    availableFiles = ClientProtocolTranslator::decodeMessage<std::vector<FileInfo>>(response);
 
     ui->availableFilesTableWidget->setRowCount(0);
     int row = 0;
 
-    for (FileInfo &fileInfo : fileInfos) {
+    for (FileInfo &fileInfo : availableFiles) {
 
         ui->availableFilesTableWidget->insertRow(row);
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
@@ -114,5 +114,17 @@ void MainWindow::getAvailableFilesButtonClicked() {
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
     LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
+//    char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
+//    std::string hash  = cm.fileHandlers[row].get()->file.get()->getHash();
+//    std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, hash);
+//    Connection tracker(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+//    tracker.write(message);
+//    std::string first9bytes = tracker.read(9);
+//    header = ProtocolUtils::decodeHeader(first9bytes.substr(0,1));
+//    uint64_t size = ProtocolUtils::decodeSize(first9bytes.substr(1,8));
+//    std::string encodedPeersWithFile = tracker.read(size);
+//    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
+    FileInfo fileInfo = availableFiles[row];
+    std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
+//    cm.fileHandlers[row].get()->startDownload(peersWithFile);
 }
-

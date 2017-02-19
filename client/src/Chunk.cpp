@@ -1,14 +1,12 @@
 #include "Chunk.h"
 #include <CustomExceptions.h>
 #include <openssl/md5.h>
-#include <sstream>
-#include <iomanip>
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
-        id(id), realSize(realSize), associatedFile(associatedFile) { }
+        id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { }
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
-        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash), downloaded(true) { }
+        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash) { }
 
 unsigned Chunk::getRealSize() const {
     return realSize;

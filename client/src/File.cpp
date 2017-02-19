@@ -5,7 +5,9 @@
 #include <CustomExceptions.h>
 
 File::File(const std::string &name) {
+    std::string baseName = name.substr(name.find_last_of("/\\") + 1);
     this->name = name;
+    this->baseName = baseName;
     // Check if the file already exists
     if (boost::filesystem::exists(name)) {
         fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary);

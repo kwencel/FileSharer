@@ -10,6 +10,7 @@
 #include "File.h"
 
 class File;
+class PeerFile;
 
 class FileHandler : public Observer {
     public:
@@ -21,7 +22,7 @@ class FileHandler : public Observer {
 
         virtual void update(Connection*) override;
         //        vector<pair<string(ip), vector<chunk>>
-        void startDownload(std::vector<std::pair<std::string, std::vector<bool>>> peers);
+        void startDownload(std::vector<PeerFile> peersWithFile);
 
         void download();
 
@@ -47,9 +48,10 @@ class FileHandler : public Observer {
          */
         std::map<std::string, std::shared_ptr<Connection>> connections;
 
-        std::vector<char> receiveChunk(Connection *connection);
-
         std::vector<char> receiveChunk(Connection *connection, uint64_t size);
+
+        std::vector<PeerFile> peersWithFile;
+        FileInfo fileInfo;
 };
 
 

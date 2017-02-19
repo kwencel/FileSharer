@@ -13,6 +13,7 @@ FileHandler::FileHandler(std::string name) {
 }
 
 FileHandler::FileHandler(FileInfo fileInfo) {
+    this->fileInfo = fileInfo;
     char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
     std::string hash = fileInfo.getHash();
 
@@ -24,7 +25,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     header = ProtocolUtils::decodeHeader(response.substr(0, 1));
     uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
     response = trackerConnection.read(size);
-    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(response);
+    peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(response);
 
     // Ask first peer about chunks hashes
     PeerFile peer = peersWithFile[0];
@@ -101,7 +102,7 @@ void FileHandler::addConnection(std::shared_ptr<Connection> connection) {
 bool FileHandler::initializeCommunication(std::shared_ptr<Connection> connection) {
     connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_HASH) +
                             ProtocolUtils::encodeSize(32) +
-                            file->getHash());
+                            fileInfo.getHash());
     std::string response = connection.get()->read(1);
     return ProtocolUtils::decodeHeader(response) == PROTOCOL_PEER_INIT_ACK;
 }
@@ -133,9 +134,9 @@ std::vector<char> FileHandler::receiveChunk(Connection *connection, uint64_t siz
     return std::vector<char>(chunkData.begin(), chunkData.end());
 }
 
-void FileHandler::startDownload(std::vector<std::pair<std::string, std::vector<bool>>> peers) {
+void FileHandler::startDownload(std::vector<PeerFile> peersWithFile) {
     // TODO Algorithm to choose which chunk to download from which peer
     for (uint64_t id = 0; id < file->getChunksAmount(); ++id) {
-        requestChunk(peers[id].first, CLIENT_BIND_PORT, id);
+        requestChunk(peersWithFile[0].getIp(), peersWithFile[0].getPort(), id);
     }
 }

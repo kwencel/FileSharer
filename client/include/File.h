@@ -97,6 +97,7 @@ class File {
 
     private:
         std::string name;
+        std::string baseName;
         std::string hash;
         uintmax_t size;
         std::vector<Chunk *> chunks;

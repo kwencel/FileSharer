@@ -46,8 +46,8 @@ bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection>
     if (header[0] == PROTOCOL_PEER_INIT_HASH) {
         std::string fileHash = connection.get()->read(32);
         for (auto &&fileHandler : fileHandlers) {
-            if (fileHandler.file->getHash() == fileHash) {
-                fileHandler.addConnection(connection);
+            if (fileHandler.get()->file->getHash() == fileHash) {
+                fileHandler.get()->addConnection(connection);
                 epoll_event epollEvent;
                 epollEvent.data.ptr = connection.get();
                 epollEvent.events = EPOLLIN;
