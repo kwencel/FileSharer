@@ -3,7 +3,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <Define.h>
-#include "ProtocolTranslator.h"
+#include "TrackerProtocolTranslator.h"
 #include "ErrorCheckUtils.h"
 #include <boost/serialization/vector.hpp>
 #include <ConnectionManager.h>
@@ -12,7 +12,7 @@
 INITIALIZE_EASYLOGGINGPP
 
 int main() {
-    ProtocolTranslator protocolTranslator;
+    TrackerProtocolTranslator protocolTranslator;
     ConnectionManager &cm = ConnectionManager::getInstance(TRACKER_BIND_IP, TRACKER_BIND_PORT);
     cm.listenLoop();
 

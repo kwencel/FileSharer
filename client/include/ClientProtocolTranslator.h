@@ -1,0 +1,8 @@
+#ifndef FILESHARER_CLIENTPROTOCOLTRANSLATOR_H
+#define FILESHARER_CLIENTPROTOCOLTRANSLATOR_H
+
+class ClientProtocolTranslator {
+        ClientProtocolTranslator();
+};
+
+#endif //FILESHARER_CLIENTPROTOCOLTRANSLATOR_H

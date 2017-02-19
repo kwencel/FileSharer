@@ -1,12 +1,12 @@
-#ifndef FILESHARER_PROTOCOLTRANSLATOR_H
-#define FILESHARER_PROTOCOLTRANSLATOR_H
+#ifndef FILESHARER_TRACKERPROTOCOLTRANSLATOR_H
+#define FILESHARER_TRACKERPROTOCOLTRANSLATOR_H
 
 #include <string>
 #include "PeerManager.h"
 
-class ProtocolTranslator {
+class TrackerProtocolTranslator {
     public:
-        ProtocolTranslator();
+        TrackerProtocolTranslator();
         /**
          * Generates a response to a message received from a client
          * @param message Message read from socket
