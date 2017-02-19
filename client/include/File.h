@@ -7,6 +7,7 @@
 #include <array>
 #include <Chunk.h>
 #include <Define.h>
+#include <FileInfo.h>
 #include "FileHandler.h"
 
 class Chunk;
@@ -28,15 +29,9 @@ class File {
          * @param size Size of the file
          * @param chunksHashes Vector of target chunk hashes
          */
-        File(const std::string &name, unsigned long size, std::string fileHash,
-             std::vector<std::string> chunksHashes);
+        File(FileInfo fileInfo, std::vector<std::string> chunksHashes);
 
         ~File();
-
-        /**
-         * Handles and issues requests concerning the file.
-         */
-        std::unique_ptr<FileHandler> fileHandler;
 
         /**
          * @return Amount of chunks the file was divided to.

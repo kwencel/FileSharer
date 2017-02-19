@@ -50,7 +50,7 @@ class FileInfo {
         /**
          * @return Size of the file 
          */
-        uint64_t getSize() const;
+        unsigned long getSize() const;
 
         /**
          * @return Vector of bool values denoting which chunks of the file are available
@@ -60,7 +60,7 @@ class FileInfo {
     private:
         std::string filename;
         std::string hash;
-        uint64_t size;
+        unsigned long size;
         std::vector<bool> availableChunks;
 };
 

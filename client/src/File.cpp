@@ -2,7 +2,6 @@
 #include <easylogging++.h>
 #include <boost/filesystem.hpp>
 #include <openssl/md5.h>
-#include <iomanip>
 #include <CustomExceptions.h>
 
 File::File(const std::string &name) {
@@ -22,25 +21,37 @@ File::File(const std::string &name) {
             hash = calculateHashMD5(0, size);
         }
         LOG(INFO) << "File " << name << " with size " << size << "B opened";
-        fileHandler = std::make_unique<FileHandler>(this);
+//        fileHandler = std::make_unique<FileHandler>(this);
     } else {
         throw FileNotFoundError(name);
     }
 }
 
-File::File(const std::string &name, unsigned long size, std::string fileHash, std::vector<std::string> chunksHashes) {
-    this->name = name;
-    this->size = size;
-    this->hash = fileHash;
-    fileHandler = std::make_unique<FileHandler>(this);
-//    fileHandler // TODO Download chunksHashes;
+//File::File(const std::string &name, unsigned long size, std::string fileHash, std::vector<std::string> chunksHashes) {
+//    this->name = name;
+//    this->size = size;
+//    this->hash = fileHash;
+//    fileHandler = std::make_unique<FileHandler>(this);
+////    fileHandler // TODO Download chunksHashes;
+//    fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+//    createChunks(chunksHashes);
+//    createMeta(chunksHashes);
+//    LOG(INFO) << "File " << name << " with size " << size << "B created";
+//    // TODO Preallocate file
+//
+//}
+
+File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
+    this->name = fileInfo.getFilename();
+    this->size = fileInfo.getSize();
+    this->hash = fileInfo.getHash();
     fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
     createChunks(chunksHashes);
     createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
     // TODO Preallocate file
-
 }
+
 
 void File::verify() {
     std::ifstream meta;
