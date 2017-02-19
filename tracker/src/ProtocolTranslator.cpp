@@ -39,7 +39,7 @@ std::string ProtocolTranslator::createResponse(std::string message) {
     }
     else if (headerByte == PROTOCOL_HEADER_LIST_FILES) {
         std::vector<FileInfo> distinctFiles = peerManager.getDistinctFiles();
-        std::string distinctFilesInfo = SerializationHelper::serialize<std::vector<FileInfo>>(distinctFiles);
+        std::string distinctFilesInfo = SerializationHelper::serialize<std::vector<FileInfo>>(headerByte, distinctFiles);
         return distinctFilesInfo;
     }
     else return "WRONG HEADER\n";

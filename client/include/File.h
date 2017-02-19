@@ -87,6 +87,9 @@ class File {
          */
         std::vector<std::string> getChunksHashes();
 
+        File(File &&) = default;
+        File(const File&) = default;
+
     private:
         std::string name;
         std::string hash;
