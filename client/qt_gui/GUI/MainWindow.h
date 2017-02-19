@@ -3,10 +3,13 @@
 
 #include <QMainWindow>
 #include <FileHandler.h>
+#include <ConnectionManager.h>
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
+
+class ConnectionManager;
 
 class MainWindow : public QMainWindow
 {
@@ -26,7 +29,7 @@ private:
         std::vector<FileInfo> getLocalFileInfos();
 
         Ui::MainWindow *ui;
-        //ConnectionManager &cm = ConnectionManager::getInstance(CLIENT_BIND_IP, CLIENT_BIND_PORT);
+        ConnectionManager &cm = ConnectionManager::getInstance(CLIENT_BIND_IP, CLIENT_BIND_PORT);
 };
 
 #endif // MAINWINDOW_H

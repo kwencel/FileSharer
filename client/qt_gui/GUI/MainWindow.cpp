@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
     header = ui->availableFilesTableWidget->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
 
-//    cm.fileHandlers = this->scanLocalFiles();
-//    cm.listenLoop();
+    cm.fileHandlers = this->scanLocalFiles();
+    cm.listenLoop();
 }
 
 MainWindow::~MainWindow()
@@ -48,34 +48,34 @@ std::vector<FileHandler> MainWindow::scanLocalFiles() {
     return fileHandlers;
 }
 
-//void MainWindow::insertLocalFiles() {
-//    ui->downloadingFilesTableWidget->setRowCount(0);
-//    int row = 0;
-//    for (FileHandler &fileHandler : this->cm.fileHandlers) {
-//        File &file = *fileHandler.file;
-//        ui->downloadingFilesTableWidget->insertRow(row);
-//        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
-//        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
-//        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(file.getRealSize())));
-//        ui->downloadingFilesTableWidget->setItem(row, 0, name);
-//        ui->downloadingFilesTableWidget->setItem(row, 1, hash);
-//        ui->downloadingFilesTableWidget->setItem(row, 2, size);
-//        ++row;
-//    }
-//}
+void MainWindow::insertLocalFiles() {
+    ui->downloadingFilesTableWidget->setRowCount(0);
+    int row = 0;
+    for (FileHandler &fileHandler : this->cm.fileHandlers) {
+        File &file = *fileHandler.file;
+        ui->downloadingFilesTableWidget->insertRow(row);
+        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
+        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(file.getHash()));
+        QTableWidgetItem *size = new QTableWidgetItem(QString::fromStdString(std::to_string(file.getRealSize())));
+        ui->downloadingFilesTableWidget->setItem(row, 0, name);
+        ui->downloadingFilesTableWidget->setItem(row, 1, hash);
+        ui->downloadingFilesTableWidget->setItem(row, 2, size);
+        ++row;
+    }
+}
 
-//std::vector<FileInfo> MainWindow::getLocalFileInfos() {
-//    std::vector<FileInfo> fileInfos;
-//    for (FileHandler &fileHandler : this->cm.fileHandlers) {
-//        File &file = *fileHandler.file;
-//        fileInfos.emplace_back(FileInfo(file.getName(), file.getHash(), file.getDownloadedChunks()));
-//    }
-//    return fileInfos;
-//}
+std::vector<FileInfo> MainWindow::getLocalFileInfos() {
+    std::vector<FileInfo> fileInfos;
+    for (FileHandler &fileHandler : this->cm.fileHandlers) {
+        File &file = *fileHandler.file;
+        fileInfos.emplace_back(FileInfo(file.getName(), file.getHash(), file.getDownloadedChunks()));
+    }
+    return fileInfos;
+}
 
 
 void MainWindow::informTrackerButtonClicked() {
-    //std::vector<FileInfo> fileInfos = this->getLocalFileInfos();
+    std::vector<FileInfo> fileInfos = this->getLocalFileInfos();
     Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
     char header = PROTOCOL_HEADER_REGISTER;
     //std::string message = ClientProtocolTranslator::generateMessage<>()
