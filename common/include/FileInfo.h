@@ -24,6 +24,7 @@ class FileInfo {
         {
             ar & filename;
             ar & hash;
+            ar & size;
             ar & availableChunks;
         }
 
@@ -45,6 +46,11 @@ class FileInfo {
          * @return Hash of the file
          */
         std::string getHash() const;
+        
+        /**
+         * @return Size of the file 
+         */
+        uint64_t getSize() const;
 
         /**
          * @return Vector of bool values denoting which chunks of the file are available
@@ -54,6 +60,7 @@ class FileInfo {
     private:
         std::string filename;
         std::string hash;
+        uint64_t size;
         std::vector<bool> availableChunks;
 };
 

@@ -7,10 +7,16 @@
 
 namespace ClientProtocolTranslator {
         template<typename T>
-        std::string generateMessage(char header, T object);
+        std::string generateMessage(char header, T object) {
+                std::string message = SerializationHelper::serialize<T>(header, object);
+                return message;
+        }
 
         template<typename T>
-        T decodeMessage(std::string message);
+        T decodeMessage(std::string message) {
+                T object = SerializationHelper::deserialize<T>(message);
+                return object;
+        }
 
 
 

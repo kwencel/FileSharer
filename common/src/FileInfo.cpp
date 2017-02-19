@@ -30,8 +30,14 @@ std::string FileInfo::getHash() const {
     return this->hash;
 }
 
+uint64_t FileInfo::getSize() const {
+    return this->size;
+}
+
+
 std::vector<bool> FileInfo::getAvailableChunks() const {
     return this->availableChunks;
 }
+
 
 
