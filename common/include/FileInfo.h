@@ -15,7 +15,7 @@ class FileInfo {
          * @param hash Hash of the file
          * @param availableChunks Vector of bool values denoting which chunks of the file are available
          */
-        FileInfo(const std::string filename, const std::string hash, std::vector<bool> availableChunks);
+        FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks);
         FileInfo();
 
         friend class boost::serialization::access;
@@ -40,7 +40,7 @@ class FileInfo {
         /**
          * @return Name of the file
          */
-        std::string getFilename() const;
+        std::string getName() const;
 
         /**
          * @return Hash of the file
@@ -67,7 +67,7 @@ class FileInfo {
 
 struct FileInfoHasher {
     size_t operator() (const FileInfo &fileInfo) const {
-        std::string temp = fileInfo.getFilename() + fileInfo.getHash();
+        std::string temp = fileInfo.getName() + fileInfo.getHash();
         return (temp.length());
     }
 };

@@ -1,8 +1,9 @@
 #include "FileInfo.h"
 
-FileInfo::FileInfo(const std::string filename, const std::string hash, std::vector<bool> availableChunks) {
+FileInfo::FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks) {
     this->filename = filename;
     this->hash = hash;
+    this->size = size;
     this->availableChunks = availableChunks;
 }
 
@@ -22,7 +23,7 @@ bool FileInfo::compareHash(std::string hashToCompare) {
     return (this->hash == hashToCompare);
 }
 
-std::string FileInfo::getFilename() const {
+std::string FileInfo::getName() const {
     return this->filename;
 }
 

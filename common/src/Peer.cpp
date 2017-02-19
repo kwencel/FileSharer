@@ -1,7 +1,8 @@
 #include "Peer.h"
 
-Peer::Peer(std::string ip, std::vector<FileInfo> fileList) {
+Peer::Peer(std::string ip, uint16_t port, std::vector<FileInfo> fileList) {
     this->ip = ip;
+    this->port = port;
     this->fileList = fileList;
 }
 

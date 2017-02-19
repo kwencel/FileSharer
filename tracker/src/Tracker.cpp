@@ -35,7 +35,9 @@ int main() {
         Connection conn = Connection(clientSocketDescriptor, serverSocket);
         std::string headerAndSize = conn.read(9);
         char header = ProtocolUtils::decodeHeader(headerAndSize.substr(0, 1));
+        LOG(DEBUG) << "Header: " + std::to_string(header);
         uint64_t size = ProtocolUtils::decodeSize(headerAndSize.substr(1, 8));
+        LOG(DEBUG) << "Size: " + std::to_string(size);
         std::string message = conn.read(size);
         std::string response = protocolTranslator.generateResponse(header, message);
         conn.write(response);

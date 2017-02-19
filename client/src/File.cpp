@@ -42,7 +42,7 @@ File::File(const std::string &name) {
 //}
 
 File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
-    this->name = fileInfo.getFilename();
+    this->name = fileInfo.getName();
     this->size = fileInfo.getSize();
     this->hash = fileInfo.getHash();
     fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
@@ -221,5 +221,5 @@ std::vector<bool> File::getDownloadedChunks() {
 }
 
 FileInfo File::getFileInfo() {
-    return FileInfo(getName(), getHash(), getDownloadedChunks());
+    return FileInfo(getName(), getHash(), getSize(), getDownloadedChunks());
 }

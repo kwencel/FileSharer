@@ -14,7 +14,7 @@ std::string TrackerProtocolTranslator::generateResponse(char header, std::string
         LOG(INFO) << "Peer registered! IP: " + newPeer.getIp() + ", number of files: " + std::to_string(newPeer.getFileList().size());
         LOG(INFO) << "Files:";
         for (FileInfo fi : newPeer.getFileList()) {
-            LOG(INFO) << "Name: " + fi.getFilename() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
+            LOG(INFO) << "Name: " + fi.getName() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
         }
         char returnHeader = PROTOCOL_HEADER_REGISTER_ACCEPT;
         std::string response = SerializationHelper::serialize<std::string>(returnHeader, "");

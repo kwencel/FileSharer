@@ -16,7 +16,7 @@ class Peer {
          * @param port Port to which peer connected
          * @param fileList Vector of FileInfo of files that the peer has and uploads
          */
-        Peer(std::string ip, std::vector<FileInfo> fileList);
+        Peer(std::string ip, uint16_t port, std::vector<FileInfo> fileList);
         Peer();
 
         /**
