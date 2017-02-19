@@ -42,6 +42,24 @@ int ConnectionManager::getOwnSocketDescriptor() {
     return ownSocketDescriptor;
 }
 
+bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection> connection) {
+    std::string header = connection.get()->read(1);
+    if (header[0] == PROTOCOL_PEER_INIT_HASH) {
+        std::string fileHash = connection.get()->read(32);
+        for (auto &&file : files) {
+            if (file.get()->getHash() == fileHash) {
+                file.get()->fileHandler.get()->addConnection(connection);
+                epoll_event epollEvent;
+                epollEvent.data.ptr = connection.get();
+                epollEvent.events = EPOLLIN;
+                epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection.get()->peerSocketDescriptor, &epollEvent);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void ConnectionManager::listenLoop() {
     CHK_MSG(listen(ownSocketDescriptor, 5), "ConnectionManager listen");
     std::thread([&]() {
@@ -54,6 +72,11 @@ void ConnectionManager::listenLoop() {
             setsockopt(peerSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
             std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerSocketDescriptor, peerSocket);
             LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
+            if (!notifyFileAboutNewConnection(conn)) {
+                // Appropriate file now found
+                close(peerSocketDescriptor);
+                continue;
+            }
             connectionsMutex.lock();
             connections.insert(conn);
             connectionsMutex.unlock();
