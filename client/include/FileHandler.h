@@ -22,6 +22,7 @@ class FileHandler : public Observer {
         void startDownload(std::vector<std::pair<std::string, std::vector<bool>>> peers);
 
         void download();
+        File *file;
 
         std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort);
 
@@ -38,7 +39,6 @@ class FileHandler : public Observer {
         void sendChunk(std::string peerIP, uint16_t peerPort, uint64_t chunkId);
 
     private:
-        File *file;
         /**
          * Stores connections to peers that has some chunks of the file
          * key: IP of the connected peer

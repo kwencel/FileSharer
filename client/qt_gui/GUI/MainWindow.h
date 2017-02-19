@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <File.h>
+#include <FileHandler.h>
 
 namespace Ui {
 class MainWindow;
@@ -22,8 +22,9 @@ public:
 
 private:
         void scanLocalFiles();
+        void insertLocalFiles();
         Ui::MainWindow *ui;
-        std::vector<File> localFiles;
+        std::vector<FileHandler> localFileHandlers;
 };
 
 #endif // MAINWINDOW_H

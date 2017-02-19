@@ -8,12 +8,12 @@ void PeerManager::addPeer(Peer peer) {
     this->peerList.push_back(peer);
 }
 
-std::vector<std::pair<std::string, std::vector<bool>>> PeerManager::getPeersWithFile(std::string hash) {
-    std::vector<std::pair<std::string, std::vector<bool>>> peerChunkAvailability;
+std::vector<PeerFile> PeerManager::getPeersWithFile(std::string hash) {
+    std::vector<PeerFile> peerChunkAvailability;
     for (Peer &p : peerList) {
         boost::optional<std::vector<bool>> availableChunks;
         if ( (availableChunks = p.checkForFile(hash)) ) {
-            peerChunkAvailability.push_back(std::make_pair(p.getIp(), *availableChunks));
+            peerChunkAvailability.emplace_back(PeerFile(p.getIp(), p.getPort(), *availableChunks));
         }
     }
     return peerChunkAvailability;

@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <string>
 #include "Peer.h"
+#include <PeerFile.h>
 
 class PeerManager {
     public:
@@ -24,7 +25,7 @@ class PeerManager {
          * @return Vector of pairs of ip of peer with the file and a vector of bool denoting which
          * chunks are available
          */
-        std::vector<std::pair<std::string, std::vector<bool>>> getPeersWithFile(std::string hash);
+        std::vector<PeerFile> getPeersWithFile(std::string hash);
 
         /**
          * Find all distinct files (by hash) among all peers
