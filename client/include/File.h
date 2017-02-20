@@ -49,6 +49,11 @@ class File {
         std::string getName() const;
 
         /**
+         * @return Name of the file.
+         */
+        std::string getRelativePath() const;
+
+        /**
          * @return MD5 hash of the file.
          */
         std::string getHash() const;
@@ -97,7 +102,7 @@ class File {
 
     private:
         std::string name;
-        std::string baseName;
+        std::string relativePath;
         std::string hash;
         uintmax_t size;
         std::vector<Chunk *> chunks;

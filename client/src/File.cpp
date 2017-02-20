@@ -7,11 +7,12 @@
 File::File(const std::string &name) { //TODO Save files in files with just name, not by full path
     std::string baseName = name.substr(name.find_last_of("/\\") + 1);
     this->name = name;
+    this->relativePath = FILES_PATH_PREFIX + name;
     // Check if the file already exists
-    if (boost::filesystem::exists(name)) {
-        fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary);
+    if (boost::filesystem::exists(relativePath)) {
+        fileStream.open(relativePath, std::ios::in | std::ios::out | std::ios::binary);
         // Check if the corresponding .meta file exists
-        if (boost::filesystem::exists(name + ".meta")) {
+        if (boost::filesystem::exists(relativePath + ".meta")) {
             // Partially downloaded file detected. Verify its condition and rebuild chunks info from .meta file
             verify();
         } else {
@@ -25,31 +26,17 @@ File::File(const std::string &name) { //TODO Save files in files with just name,
             hash = calculateHashMD5(0, size);
         }
         LOG(INFO) << "File " << name << " with size " << size << "B opened";
-//        fileHandler = std::make_unique<FileHandler>(this);
     } else {
         throw FileNotFoundError(name);
     }
 }
 
-//File::File(const std::string &name, unsigned long size, std::string fileHash, std::vector<std::string> chunksHashes) {
-//    this->name = name;
-//    this->size = size;
-//    this->hash = fileHash;
-//    fileHandler = std::make_unique<FileHandler>(this);
-////    fileHandler // TODO Download chunksHashes;
-//    fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-//    createChunks(chunksHashes);
-//    createMeta(chunksHashes);
-//    LOG(INFO) << "File " << name << " with size " << size << "B created";
-//    // TODO Preallocate file
-//
-//}
-
 File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
     this->name = fileInfo.getName();
+    this->relativePath = FILES_PATH_PREFIX + name;
     this->size = fileInfo.getSize();
     this->hash = fileInfo.getHash();
-    fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+    fileStream.open(relativePath, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
     createChunks(chunksHashes);
     createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
@@ -59,7 +46,7 @@ File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
 
 void File::verify() {
     std::ifstream meta;
-    meta.open(name + ".meta", std::ios::in);
+    meta.open(relativePath + ".meta", std::ios::in);
     meta >> hash;
     meta >> size;
     unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
@@ -75,7 +62,7 @@ void File::verify() {
 
 void File::createMeta(std::vector<std::string> &chunksHashes) {
     std::ofstream meta;
-    meta.open(name + ".meta", std::ios::out | std::ios::trunc);
+    meta.open(relativePath + ".meta", std::ios::out | std::ios::trunc);
     meta << hash << std::endl;
     meta << size << std::endl;
     for (unsigned long i = 0; i < chunksHashes.size(); ++i) {
@@ -107,7 +94,7 @@ void File::createChunks(std::vector<std::string> &chunksHashes) {
 }
 
 unsigned long File::getRealSize() {
-    return boost::filesystem::file_size(name);
+    return boost::filesystem::file_size(relativePath);
 }
 
 void File::notifyChunkDownloaded(unsigned long chunkId) {
@@ -166,6 +153,10 @@ bool File::writeBytes(unsigned long from, unsigned long howMany, std::vector<cha
 
 std::string File::getName() const {
     return name;
+}
+
+std::string File::getRelativePath() const {
+    return relativePath;
 }
 
 std::string File::getHash() const {

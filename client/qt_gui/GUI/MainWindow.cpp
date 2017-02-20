@@ -38,12 +38,15 @@ std::vector<std::shared_ptr<FileHandler>> MainWindow::scanLocalFiles() {
     std::vector<std::shared_ptr<FileHandler>> fileHandlers;
 
     if (fs::exists(fullPath) && fs::is_directory(fullPath)) {
-        for(fs::directory_iterator dirIter(fullPath);dirIter != end_iter;++dirIter)
-        {
-            LOG(INFO) << dirIter->path().string();
-            if (fs::is_regular_file(dirIter->status()) )
-            {
-                std::string path = dirIter->path().string();
+        for (fs::directory_iterator dirIter(fullPath); dirIter != end_iter; ++dirIter) {
+            std::string filePath = dirIter->path().string();
+            if (filePath.substr(filePath.length() - 5) == ".meta") {
+                LOG(INFO) << "Skipping .meta file " + filePath;
+                continue;
+            }
+            LOG(INFO) << filePath;
+            if (fs::is_regular_file(dirIter->status()) ) {
+                std::string path = dirIter->path().filename().string();
                 fileHandlers.emplace_back(std::make_shared<FileHandler>(path));
             }
         }
@@ -126,6 +129,6 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 //    std::string encodedPeersWithFile = tracker.read(size);
 //    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
     FileInfo fileInfo = availableFiles[row];
-    std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
-//    cm.fileHandlers[row].get()->startDownload(peersWithFile);
+    FileHandler* newFileHandler = new FileHandler(fileInfo);
+    newFileHandler->beginDownload();
 }

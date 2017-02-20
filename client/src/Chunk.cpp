@@ -3,7 +3,7 @@
 #include <openssl/md5.h>
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
-        id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { }
+        id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { } // FIXME NOT ALWAYS TRUE! CHECK IN CONSTRUCTOR IF HASH MATCHES WITH WHAT IS ON DISK
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
         id(id), realSize(realSize), associatedFile(associatedFile), hash(hash) { }

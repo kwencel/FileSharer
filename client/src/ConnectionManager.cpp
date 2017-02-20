@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
+#include <ProtocolUtils.h>
 #include "include/ConnectionManager.h"
 
 #pragma clang diagnostic push
@@ -42,8 +43,8 @@ int ConnectionManager::getOwnSocketDescriptor() {
 }
 
 bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection> connection) {
-    std::string header = connection.get()->read(1);
-    if (header[0] == PROTOCOL_PEER_INIT_HASH) {
+    char header = connection.get()->read(1)[0];
+    if (header == PROTOCOL_PEER_INIT_HASH) {
         std::string fileHash = connection.get()->read(32);
         for (auto &&fileHandler : fileHandlers) {
             if (fileHandler.get()->file->getHash() == fileHash) {
@@ -52,6 +53,7 @@ bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection>
                 epollEvent.data.ptr = connection.get();
                 epollEvent.events = EPOLLIN;
                 epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection.get()->peerSocketDescriptor, &epollEvent);
+                connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_ACK));
                 return true;
             }
         }
@@ -115,7 +117,7 @@ void ConnectionManager::processIncomingConnections() {
         int rc;
         while (true) {
             do {
-                epoll_wait(epollDescriptor, &epollEvent, 1, -1);
+                rc = epoll_wait(epollDescriptor, &epollEvent, 1, -1);
             } while (rc == -1 && errno == EINTR);
             Connection* connection = static_cast<Connection *>(epollEvent.data.ptr);
             if (connection != nullptr) {

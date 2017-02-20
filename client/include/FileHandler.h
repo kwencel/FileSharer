@@ -15,17 +15,15 @@ class File;
 
 class FileHandler : public Observer {
     public:
-        FileHandler(File *file);
-
         FileHandler(FileInfo fileInfo);
 
         FileHandler(std::string name);
 
         virtual void update(Connection*) override;
-        //        vector<pair<string(ip), vector<chunk>>
-        void startDownload(std::vector<PeerFile> peersWithFile);
 
         void download();
+
+        void beginDownload();
 
         std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort);
 
@@ -49,7 +47,7 @@ class FileHandler : public Observer {
          */
         std::map<std::string, std::shared_ptr<Connection>> connections;
 
-        std::vector<char> receiveChunk(Connection *connection, uint64_t size);
+        void receiveChunk(Connection *connection);
 
         std::vector<PeerFile> peersWithFile;
         FileInfo fileInfo;
