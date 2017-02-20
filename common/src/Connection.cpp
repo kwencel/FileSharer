@@ -45,7 +45,7 @@ std::string Connection::read(size_t howMany, time_t timeout) {
     std::string data;
     ssize_t readBytes = 0;
     size_t toRead;
-    int retriesLeft = READ_RETRIES;
+    int retries = 0;
     char buffer[RECEIVE_BUFFER];
 
     struct timeval tv;
@@ -59,11 +59,13 @@ std::string Connection::read(size_t howMany, time_t timeout) {
         } else {
             toRead = howMany;
         }
-        do {
+        readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
+        while (errno == EAGAIN && retries < READ_RETRIES) {
+            ++retries;
+            LOG(WARNING) << "Read() timeout - retry attempt " + std::to_string(retries);
             readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
-            --retriesLeft;
-        } while (errno == EAGAIN && retriesLeft >= 0);
-        if (retriesLeft == -1) {
+        }
+        if (errno == EAGAIN) {
             throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort()); //TODO test read timeout
         }
         else if (readBytes == -1) {
