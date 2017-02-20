@@ -73,7 +73,8 @@ void ConnectionManager::listenLoop() {
             LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
             if (!notifyFileAboutNewConnection(conn)) {
                 // Appropriate file now found
-                close(peerSocketDescriptor);
+                LOG(DEBUG) << "Connecion would be closed";
+//                close(peerSocketDescriptor);
                 continue;
             }
             connectionsMutex.lock();
@@ -110,10 +111,16 @@ std::shared_ptr<Connection> ConnectionManager::requestConnection(std::string pee
 
 void ConnectionManager::processIncomingConnections() {
     std::thread([&]() {
-        epoll_event epollEvent;
+        epoll_event epollEvent {0};
+        int rc;
         while (true) {
-            epoll_wait(epollDescriptor, &epollEvent, 1, -1);
-            static_cast<Connection *>(epollEvent.data.ptr)->notify();
+            do {
+                epoll_wait(epollDescriptor, &epollEvent, 1, -1);
+            } while (rc == -1 && errno == EINTR);
+            Connection* connection = static_cast<Connection *>(epollEvent.data.ptr);
+            if (connection != nullptr) {
+                connection->notify();
+            }
         }
     }).detach();
 }

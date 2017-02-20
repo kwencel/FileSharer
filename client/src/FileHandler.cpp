@@ -3,7 +3,6 @@
 #include <ProtocolUtils.h>
 #include <easylogging++.h>
 #include <ClientProtocolTranslator.h>
-#include <PeerFile.h>
 #include <bitset>
 
 FileHandler::FileHandler(File *file) : file(file) { }
@@ -38,6 +37,8 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     size =  ProtocolUtils::decodeSize(response.substr(1, 8));
     response = peerConnection.get()->read(size);
 
+    peerConnection.get()->registerObserver(this);
+
     std::vector<std::string> hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);
 
     // Finally call the File constructor
@@ -45,7 +46,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
 }
 
 void FileHandler::update(Connection* connection) {
-    LOG(INFO) << "Message from" << connection->getPeerIP() << ":" << connection->getPeerPort() << std::endl;
+    LOG(INFO) << "Message from " << connection->getPeerIP() << ":" << connection->getPeerPort() << std::endl;
     char header = connection->read(1)[0];
     switch (header) {
         case PROTOCOL_PEER_REQUEST_CHUNK: {
@@ -85,7 +86,7 @@ std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP,
         conn = ConnectionManager::getInstance().requestConnection(peerIP, peerPort);
         if (initializeCommunication(conn)) {
             connections.insert({peerIP, conn});
-            conn.get()->registerObserver(this);
+//            conn.get()->registerObserver(this);
         } else {
             LOG(ERROR) << "Peer " << peerIP << ":" << peerPort << " did not send ACK on communication initialization!";
         }
@@ -101,7 +102,6 @@ void FileHandler::addConnection(std::shared_ptr<Connection> connection) {
 
 bool FileHandler::initializeCommunication(std::shared_ptr<Connection> connection) {
     connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_HASH) +
-                            ProtocolUtils::encodeSize(32) +
                             fileInfo.getHash());
     std::string response = connection.get()->read(1);
     return ProtocolUtils::decodeHeader(response) == PROTOCOL_PEER_INIT_ACK;

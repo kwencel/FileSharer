@@ -7,10 +7,11 @@
 #include <memory>
 #include <unordered_set>
 #include <map>
+#include <PeerFile.h>
 #include "File.h"
 
 class File;
-class PeerFile;
+//class PeerFile;
 
 class FileHandler : public Observer {
     public:

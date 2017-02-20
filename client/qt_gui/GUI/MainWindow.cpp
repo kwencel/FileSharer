@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     cm.fileHandlers = this->scanLocalFiles(); // FIXME Pass by reference!!!
     insertLocalFiles();
     cm.listenLoop();
+    cm.processIncomingConnections();
 }
 
 MainWindow::~MainWindow()
@@ -113,7 +114,7 @@ void MainWindow::getAvailableFilesButtonClicked() {
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-    LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
+//    LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
 //    char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
 //    std::string hash  = cm.fileHandlers[row].get()->file.get()->getHash();
 //    std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, hash);

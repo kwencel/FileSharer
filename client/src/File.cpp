@@ -4,10 +4,9 @@
 #include <openssl/md5.h>
 #include <CustomExceptions.h>
 
-File::File(const std::string &name) {
+File::File(const std::string &name) { //TODO Save files in files with just name, not by full path
     std::string baseName = name.substr(name.find_last_of("/\\") + 1);
     this->name = name;
-    this->baseName = baseName;
     // Check if the file already exists
     if (boost::filesystem::exists(name)) {
         fileStream.open(name, std::ios::in | std::ios::out | std::ios::binary);
@@ -19,6 +18,9 @@ File::File(const std::string &name) {
             // Assuming the file is fully downloaded and ready to be shared
             LOG(INFO) << "Metadata for " << name << " does not exist";
             size = getRealSize();
+            if (size == 0) {
+                std::runtime_error("File size is equal to 0");
+            }
             createChunks();
             hash = calculateHashMD5(0, size);
         }
