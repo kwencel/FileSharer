@@ -5,7 +5,7 @@
 
 namespace {
     Connection establishConnectionToTracker() {
-        Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+        Connection conn(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
         return conn;
     }
 
@@ -14,6 +14,7 @@ namespace {
         char header = ProtocolUtils::decodeHeader(headerAndSize.substr(0, 1));
         uint64_t restOfMessageSize = ProtocolUtils::decodeSize(headerAndSize.substr(1, 8));
         std::string responseDataString = conn.read(restOfMessageSize);
+        return responseDataString;
     }
 }
 

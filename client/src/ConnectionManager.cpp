@@ -134,4 +134,20 @@ void ConnectionManager::removeConnection(Connection *connection) {
     connectionsMutex.unlock();
 }
 
+void ConnectionManager::addFileHandler(std::shared_ptr<FileHandler> newFileHandler) {
+    fileHandlersMutex.lock();
+    this->fileHandlers.push_back(newFileHandler);
+    fileHandlersMutex.unlock();
+}
+
+void ConnectionManager::setFileHandlers(std::vector<std::shared_ptr<FileHandler>> fileHandlers) {
+    fileHandlersMutex.lock();
+    this->fileHandlers = fileHandlers;
+    fileHandlersMutex.unlock();
+}
+
+const std::vector<std::shared_ptr<FileHandler>>& ConnectionManager::getFileHandlers() const {
+    return this->fileHandlers;
+}
+
 #pragma clang diagnostic pop

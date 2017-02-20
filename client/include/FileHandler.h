@@ -11,7 +11,6 @@
 #include "File.h"
 
 class File;
-//class PeerFile;
 
 class FileHandler : public Observer {
     public:

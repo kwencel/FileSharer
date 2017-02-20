@@ -27,8 +27,9 @@ class ConnectionManager {
          */
         void listenLoop();
         void processIncomingConnections();
-
-        std::vector<std::shared_ptr<FileHandler>> fileHandlers;
+        void addFileHandler(std::shared_ptr<FileHandler> newFileHandler);
+        void setFileHandlers(std::vector<std::shared_ptr<FileHandler>> fileHandlers);
+        const std::vector<std::shared_ptr<FileHandler>>& getFileHandlers() const;
 
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);
@@ -38,6 +39,8 @@ class ConnectionManager {
         int ownSocketDescriptor;
         std::unordered_set<std::shared_ptr<Connection>> connections;
         std::mutex connectionsMutex;
+        std::vector<std::shared_ptr<FileHandler>> fileHandlers;
+        std::mutex fileHandlersMutex;
 
         ConnectionManager() = delete;
         ConnectionManager(const ConnectionManager &) = delete;

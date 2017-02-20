@@ -4,6 +4,7 @@
 #include <easylogging++.h>
 #include <ClientProtocolTranslator.h>
 #include <bitset>
+#include <TrackerHandler.h>
 
 FileHandler::FileHandler(std::string name) {
     file = std::make_unique<File>(name);
@@ -15,14 +16,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     std::string hash = fileInfo.getHash();
 
     // Get information about peers having this file from tracker
-    Connection trackerConnection(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
-    std::string peersWithFileRequest = ClientProtocolTranslator::generateMessage<std::string>(header, hash);
-    trackerConnection.write(peersWithFileRequest);
-    std::string response = trackerConnection.read(9);
-    header = ProtocolUtils::decodeHeader(response.substr(0, 1));
-    uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
-    response = trackerConnection.read(size);
-    peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(response);
+    peersWithFile = TrackerHandler::getPeersWithFileByHash(hash);
 
     // Ask first peer about chunks hashes
     PeerFile peer = peersWithFile[0];
@@ -30,9 +24,9 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     uint16_t peerPort = peer.getPort();
     std::shared_ptr<Connection> peerConnection = establishConnection(peerIP, peerPort);
     peerConnection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
-    response = peerConnection.get()->read(9);
+    std::string response = peerConnection.get()->read(9);
     header = ProtocolUtils::decodeHeader(response.substr(0, 1));
-    size =  ProtocolUtils::decodeSize(response.substr(1, 8));
+    uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
     response = peerConnection.get()->read(size);
 
     std::vector<std::string> hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);

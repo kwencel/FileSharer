@@ -31,6 +31,7 @@ void Chunk::setData(std::vector<char> data) {
     this->data = data;
     this->downloaded = true;
     associatedFile->notifyChunkDownloaded(id);
+    data.clear();
 }
 
 unsigned long Chunk::getId() const {
