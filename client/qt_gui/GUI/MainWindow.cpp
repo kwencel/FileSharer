@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     header = ui->availableFilesTableWidget->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
 
-    cm.fileHandlers = this->scanLocalFiles(); // FIXME Pass by reference!!!
+    cm.setFileHandlers(this->scanLocalFiles());
     insertLocalFiles();
     cm.listenLoop();
 }
@@ -53,7 +53,7 @@ std::vector<std::shared_ptr<FileHandler>> MainWindow::scanLocalFiles() {
 void MainWindow::insertLocalFiles() {
     ui->downloadingFilesTableWidget->setRowCount(0);
     int row = 0;
-    for (auto fileHandler : this->cm.fileHandlers) {
+    for (auto fileHandler : this->cm.getFileHandlers()) {
         File &file = *fileHandler.get()->file;
         ui->downloadingFilesTableWidget->insertRow(row);
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(file.getName()));
@@ -68,7 +68,7 @@ void MainWindow::insertLocalFiles() {
 
 std::vector<FileInfo> MainWindow::getLocalFileInfos() {
     std::vector<FileInfo> fileInfos;
-    for (auto fileHandler : this->cm.fileHandlers) {
+    for (auto fileHandler : this->cm.getFileHandlers()) {
         File &file = *fileHandler.get()->file;
         fileInfos.emplace_back(file.getFileInfo());
     }

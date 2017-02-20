@@ -17,12 +17,13 @@ std::string TrackerProtocolTranslator::generateResponse(char header, std::string
             for (FileInfo fi : newPeer.getFileList()) {
                 LOG(INFO) << "Name: " + fi.getName() + ", hash: " + fi.getHash() + ", chunks: " + fi.printChunks();
             }
+            header = PROTOCOL_HEADER_REGISTER_ACCEPT;
         }
         else {
             LOG(INFO) << "Peer with IP: " + newPeer.getIp() + " already registered!";
+            header = PROTOCOL_HEADER_REGISTER_DUPLICATE;
         }
-        char returnHeader = PROTOCOL_HEADER_REGISTER_ACCEPT;
-        std::string response = SerializationHelper::serialize<std::string>(returnHeader, "");
+        std::string response = SerializationHelper::serialize<std::string>(header, "");
         LOG(INFO) << "Response size: " + std::to_string(response.size());
         return response;
     }
