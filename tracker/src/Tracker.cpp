@@ -39,7 +39,7 @@ int main() {
         uint64_t size = ProtocolUtils::decodeSize(headerAndSize.substr(1, 8));
         LOG(DEBUG) << "Size: " + std::to_string(size);
         std::string message = conn.read(size);
-        std::string response = protocolTranslator.generateResponse(header, message);
+        std::string response = protocolTranslator.generateResponse(header, message, conn);
         conn.write(response);
     }
 

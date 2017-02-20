@@ -3,6 +3,7 @@
 
 #include <string>
 #include "PeerManager.h"
+#include <Connection.h>
 
 class TrackerProtocolTranslator {
     public:
@@ -12,7 +13,7 @@ class TrackerProtocolTranslator {
          * @param message Message read from socket
          * @return String response to be sent to client
          */
-        std::string generateResponse(char header, std::string message);
+        std::string generateResponse(char header, std::string message, Connection &conn);
 
     private:
         PeerManager peerManager;
