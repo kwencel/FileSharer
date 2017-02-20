@@ -127,8 +127,21 @@ void FileHandler::receiveChunk(Connection *connection) {
 }
 
 void FileHandler::beginDownload() {
-    // TODO Algorithm to choose which chunk to download from which peer
+    std::vector<uint64_t> peerLoads(peersWithFile.size(), 0);
     for (uint64_t id = 0; id < file->getChunksAmount(); ++id) {
-        requestChunk(peersWithFile[0].getIp(), peersWithFile[0].getPort(), id);
+        if (!file->getChunks()[id]->isDownloaded()) {
+            std::vector<uint64_t> loads;
+            std::vector<uint64_t> indexes;
+            for (uint64_t peerIndex = 0; peerIndex < peersWithFile.size(); ++peerIndex) {
+                if (peersWithFile[peerIndex].getAvailableChunks()[id]) {
+                    indexes.push_back(peerIndex);
+                    loads.push_back(peerLoads[peerIndex]);
+                }
+            }
+            long lowestLoadPosition = std::distance(loads.begin(), std::min_element(loads.begin(), loads.end()));
+            long lowestLoadPeerIndex = indexes[lowestLoadPosition];
+            requestChunk(peersWithFile[lowestLoadPeerIndex].getIp(), peersWithFile[lowestLoadPeerIndex].getPort(), id);
+            peerLoads[lowestLoadPeerIndex]++;
+        }
     }
 }
