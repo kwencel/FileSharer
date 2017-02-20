@@ -15,7 +15,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     std::string hash = fileInfo.getHash();
 
     // Get information about peers having this file from tracker
-    Connection trackerConnection(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+    Connection trackerConnection(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
     std::string peersWithFileRequest = ClientProtocolTranslator::generateMessage<std::string>(header, hash);
     trackerConnection.write(peersWithFileRequest);
     std::string response = trackerConnection.read(9);

@@ -1,7 +1,6 @@
 #include <easylogging++.h>
 #include "TrackerProtocolTranslator.h"
 #include "SerializationHelper.h"
-#include "Define.h"
 
 TrackerProtocolTranslator::TrackerProtocolTranslator() {
 
@@ -10,7 +9,7 @@ TrackerProtocolTranslator::TrackerProtocolTranslator() {
 std::string TrackerProtocolTranslator::generateResponse(char header, std::string message, Connection &conn) {
     if (header == PROTOCOL_HEADER_REGISTER) {
         Peer newPeer2 = SerializationHelper::deserialize<Peer>(message);
-        Peer newPeer = Peer(conn.getPeerIP(), conn.getPeerPort(), newPeer2.getFileList());
+        Peer newPeer = Peer(conn.getPeerIP(), newPeer2.getPort(), newPeer2.getFileList());
         if (peerManager.addPeer(newPeer)) { // TODO tested on localhost - works but try to test again
             LOG(INFO) << "Peer registered! IP: " + newPeer.getIp() + ", number of files: " +
                          std::to_string(newPeer.getFileList().size());

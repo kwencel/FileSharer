@@ -1,21 +1,15 @@
 #ifndef FILESHARER_DEFINE_H
 #define FILESHARER_DEFINE_H
 
+#include "NetworkSettings.h"
+
 //CLIENT
 
 #define CHUNK_SIZE_KB       128
 #define MD5_BUFFER_SIZE     1024
-#define CLIENT_BIND_IP      "127.0.0.1"
-#define CLIENT_BIND_PORT    2048
 #define RECEIVE_BUFFER      1024
 #define CHUNK_SIZE          (1024 * CHUNK_SIZE_KB)
 #define FILES_PATH_PREFIX   "files/"
-
-//TRACKER
-
-#define TRACKER_BIND_IP     "192.168.1.103"
-#define TRACKER_BIND_PORT   2049
-#define TRACKER_PUBLIC_IP   "123.456.789"
 
 //PROTOCOL
 

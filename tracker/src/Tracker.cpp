@@ -6,7 +6,6 @@
 #include "TrackerProtocolTranslator.h"
 #include <boost/serialization/vector.hpp>
 #include <ProtocolUtils.h>
-#include <Connection.h>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -33,6 +32,7 @@ int main() {
         int enable = 1;
         setsockopt(clientSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
         Connection conn = Connection(clientSocketDescriptor, serverSocket);
+        LOG(DEBUG) << "Connected peer: " << conn.getPeerIP() << ":" << conn.getPeerPort();
         std::string headerAndSize = conn.read(9);
         char header = ProtocolUtils::decodeHeader(headerAndSize.substr(0, 1));
         LOG(DEBUG) << "Header: " + std::to_string(header);

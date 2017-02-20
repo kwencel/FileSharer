@@ -83,7 +83,7 @@ std::vector<FileInfo> MainWindow::getLocalFileInfos() {
 void MainWindow::informTrackerButtonClicked() {
     std::vector<FileInfo> fileInfos = this->getLocalFileInfos();
     Peer localPeer(this->cm.getOwnIP(), this->cm.getOwnPort(), fileInfos);
-    Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+    Connection conn(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
     char header = PROTOCOL_HEADER_REGISTER;
     std::string message = ClientProtocolTranslator::generateMessage<Peer>(header, localPeer);
     conn.write(message);
