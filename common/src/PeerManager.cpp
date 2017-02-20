@@ -6,7 +6,7 @@ PeerManager::PeerManager() {
 }
 
 bool PeerManager::addPeer(Peer peer) {
-    boost::optional<Peer*> searchedForPeer = isPeerAdded(peer.getIp());
+    boost::optional<Peer*> searchedForPeer = isPeerAdded(peer.getIp(), peer.getPort());
     if (searchedForPeer) {
         (*searchedForPeer)->setFileList(peer.getFileList());
         return false;
@@ -17,9 +17,9 @@ bool PeerManager::addPeer(Peer peer) {
     }
 }
 
-boost::optional<Peer*> PeerManager::isPeerAdded(std::string ip) {
+boost::optional<Peer*> PeerManager::isPeerAdded(std::string ip, uint16_t port) {
     for (Peer &p : peerList) {
-        if (p.getIp() == ip) return boost::optional<Peer*>(&p);
+        if (p.getIp() == ip && p.getPort() == port) return boost::optional<Peer*>(&p);
     }
     return boost::none;
 }

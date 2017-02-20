@@ -33,7 +33,7 @@ class PeerManager {
          */
         std::vector<FileInfo> getDistinctFiles();
     private:
-        boost::optional<Peer*> isPeerAdded(std::string ip);
+        boost::optional<Peer*> isPeerAdded(std::string ip, uint16_t);
         std::vector<Peer> peerList;
 };
 
