@@ -17,9 +17,10 @@ int main(int argc, char *argv[]) {
 //        kopiaChunks[i]->setData(sinewave.readChunkData(i));
 //    }
 
-    uint16_t port = (uint16_t) atoi(argv[1]);
+    std::string ip = argv[1];
+    uint16_t port = (uint16_t) atoi(argv[2]);
     std::cout << port << std::endl;
-    ConnectionManager &cm = ConnectionManager::getInstance("127.0.0.1", port);
+    ConnectionManager &cm = ConnectionManager::getInstance(ip, port);
 
     std::cout << QT_VERSION_STR;
     QApplication a(argc, argv);

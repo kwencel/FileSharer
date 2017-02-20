@@ -90,7 +90,7 @@ void MainWindow::informTrackerButtonClicked() {
 }
 
 void MainWindow::getAvailableFilesButtonClicked() {
-    Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
+    Connection conn(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
     char header = PROTOCOL_HEADER_LIST_FILES;
     std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, "");
     conn.write(message);

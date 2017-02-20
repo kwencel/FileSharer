@@ -13,8 +13,9 @@
 
 //TRACKER
 
-#define TRACKER_BIND_IP     "127.0.0.1"
+#define TRACKER_BIND_IP     "192.168.1.103"
 #define TRACKER_BIND_PORT   2049
+#define TRACKER_PUBLIC_IP   "123.456.789"
 
 //PROTOCOL
 
