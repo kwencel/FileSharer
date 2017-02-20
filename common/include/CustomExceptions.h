@@ -33,5 +33,11 @@ class FileNotFoundError : public std::runtime_error {
                 std::runtime_error("File " + filename + " does not exists") { }
 };
 
+class ReadTimeoutError : public std::runtime_error {
+    public:
+        ReadTimeoutError(std::string ip, uint16_t port) :
+                std::runtime_error("Read timeout on " + ip + ":" + std::to_string(port)) { }
+};
+
 
 #endif //FILESHARER_CUSTOMEXCEPTIONS_H

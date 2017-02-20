@@ -3,9 +3,9 @@
 #include <ConnectionManager.h>
 #include <boost/filesystem.hpp>
 #include <Peer.h>
-#include <ClientProtocolTranslator.h>
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include <TrackerHandler.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -77,30 +77,16 @@ std::vector<FileInfo> MainWindow::getLocalFileInfos() {
 
 
 void MainWindow::informTrackerButtonClicked() {
-    std::vector<FileInfo> fileInfos = this->getLocalFileInfos();
-    Peer localPeer(this->cm.getOwnIP(), this->cm.getOwnPort(), fileInfos);
-    Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-    char header = PROTOCOL_HEADER_REGISTER;
-    std::string message = ClientProtocolTranslator::generateMessage<Peer>(header, localPeer);
-    conn.write(message);
+    std::vector<FileInfo> localFileInfoVector = this->getLocalFileInfos();
+    std::string response = TrackerHandler::registerToTracker(cm.getOwnIP(), cm.getOwnPort(), localFileInfoVector);
 }
 
 void MainWindow::getAvailableFilesButtonClicked() {
-    Connection conn(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-    char header = PROTOCOL_HEADER_LIST_FILES;
-    std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, "");
-    conn.write(message);
-    std::string first = conn.read(9);
-    header = ProtocolUtils::decodeHeader(first.substr(0, 1));
-    uint64_t  size = ProtocolUtils::decodeSize(first.substr(1, 8));
-    std::string response = conn.read(size);
-    availableFiles = ClientProtocolTranslator::decodeMessage<std::vector<FileInfo>>(response);
-
+    std::vector<FileInfo> availableFiles = TrackerHandler::getAvailableFiles();
     ui->availableFilesTableWidget->setRowCount(0);
     int row = 0;
 
     for (FileInfo &fileInfo : availableFiles) {
-
         ui->availableFilesTableWidget->insertRow(row);
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
         QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));

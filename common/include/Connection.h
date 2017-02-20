@@ -57,7 +57,7 @@ class Connection {
          * @param howMany Number of bytes to be read
          * @return Received information
          */
-        std::string read(size_t howMany = RECEIVE_BUFFER);
+        std::string read(size_t howMany = RECEIVE_BUFFER, time_t timeout = 3);
 
         void notify();
 

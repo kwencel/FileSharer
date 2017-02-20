@@ -4,6 +4,7 @@
 #include "Connection.h"
 #include <unistd.h>
 #include <CustomExceptions.h>
+#include <sys/time.h>
 
 Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocket.sin_family = AF_INET;
@@ -37,23 +38,35 @@ ssize_t Connection::write(std::string data) {
     return send(peerSocketDescriptor, data.c_str(), data.length(), 0);
 }
 
-std::string Connection::read(size_t howMany) {
+std::string Connection::read(size_t howMany, time_t timeout) {
     if (howMany > RECEIVE_BUFFER) {
         LOG(DEBUG) << "Requested read won't fit into receiving buffer. Fallback to safe buffer length value.";
     }
     std::string data;
     ssize_t readBytes = 0;
     size_t toRead;
+    int retriesLeft = READ_RETRIES;
     char buffer[RECEIVE_BUFFER];
+
+    struct timeval tv;
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    setsockopt(this->peerSocketDescriptor, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(struct timeval));
+
     do {
         if (howMany > RECEIVE_BUFFER) {
             toRead = RECEIVE_BUFFER;
         } else {
             toRead = howMany;
         }
-        // TODO Add timeout
-        readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
-        if (readBytes == -1) {
+        do {
+            readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
+            --retriesLeft;
+        } while (errno == EAGAIN && retriesLeft >= 0);
+        if (retriesLeft == -1) {
+            throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort()); //TODO test read timeout
+        }
+        else if (readBytes == -1) {
             perror("Error during read in Connection");
             throw std::runtime_error("Error during read in Connection");
         }

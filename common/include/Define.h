@@ -9,6 +9,7 @@
 #define CLIENT_BIND_PORT    2048
 #define RECEIVE_BUFFER      1024
 #define CHUNK_SIZE          (1024 * CHUNK_SIZE_KB)
+#define READ_RETRIES        3
 
 //TRACKER
 
