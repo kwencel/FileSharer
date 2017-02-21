@@ -12,7 +12,6 @@ namespace {
 
     std::string getResponseDataString(Connection &conn) {
         std::string headerAndSize = conn.read(9);
-        char header = ProtocolUtils::decodeHeader(headerAndSize.substr(0, 1));
         uint64_t restOfMessageSize = ProtocolUtils::decodeSize(headerAndSize.substr(1, 8));
         std::string responseDataString = conn.read(restOfMessageSize);
         return responseDataString;

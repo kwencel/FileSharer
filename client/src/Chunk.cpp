@@ -6,7 +6,7 @@ Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
         id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { };
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
-        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash) {
+        id(id), realSize(realSize), hash(hash), associatedFile(associatedFile) {
     std::vector<char> tmpData;
     tmpData = associatedFile->readChunkData(this);
     if (calculateHashMD5(tmpData) == hash) {

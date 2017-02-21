@@ -5,8 +5,6 @@
 #include <ProtocolUtils.h>
 #include "include/ConnectionManager.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
 ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocket.sin_family = AF_INET;
@@ -164,6 +162,3 @@ const std::string ConnectionManager::getTrackerIP() const {
 uint16_t ConnectionManager::getTrackerPort() const {
     return trackerPort;
 }
-
-
-#pragma clang diagnostic pop

@@ -167,14 +167,14 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
     std::string stringProgress = stream.str();
     QString qStringProgress = QString::fromStdString(stringProgress);
 
-    for (unsigned int i = 0; i < ui->availableFilesTableWidget->rowCount(); ++i) {
+    for (unsigned int i = 0; i < (unsigned int) ui->availableFilesTableWidget->rowCount(); ++i) {
         std::string rowHash = ui->availableFilesTableWidget->item(i, 1)->text().toStdString();
         if (rowHash == hash) {
             ui->availableFilesTableWidget->item(i, 3)->setText(qStringProgress);
             if (stringProgress == "100") {
                 QFont newFont = ui->availableFilesTableWidget->item(i,3)->font();
                 newFont.setBold(false);
-                for (unsigned int j = 0; j < ui->availableFilesTableWidget->columnCount(); ++j) {
+                for (unsigned int j = 0; j < (unsigned int) ui->availableFilesTableWidget->columnCount(); ++j) {
                     ui->availableFilesTableWidget->item(i, j)->setFont(newFont);
                 }
             }

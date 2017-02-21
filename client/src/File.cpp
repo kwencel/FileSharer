@@ -158,7 +158,7 @@ std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
     std::vector<char> buffer(howMany);
     fileStream.read(buffer.data(), howMany);
     std::streamsize bytes = fileStream.gcount();
-    if (bytes < howMany) {
+    if ((unsigned long)bytes < howMany) {
         buffer.resize((unsigned long) bytes);
     }
     return buffer;
@@ -228,7 +228,7 @@ File::~File() {
 
 std::vector<bool> File::getDownloadedChunks() {
     std::vector<bool> remainingChunks(getChunksAmount(), false);
-    for (int i = 0; i < getChunksAmount(); ++i) {
+    for (unsigned int i = 0; i < getChunksAmount(); ++i) {
         if (chunks[i]->isDownloaded()) {
             remainingChunks[i] = true;
         }

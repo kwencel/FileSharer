@@ -7,9 +7,6 @@
 #include <ProtocolUtils.h>
 #include <ErrorCheckUtils.h>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[]) {
@@ -61,4 +58,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-#pragma clang diagnostic pop

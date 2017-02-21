@@ -13,7 +13,6 @@ FileHandler::FileHandler(std::string name) {
 
 FileHandler::FileHandler(FileInfo fileInfo) {
     this->fileInfo = fileInfo;
-    char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
     std::string hash = fileInfo.getHash();
 
     // Get information about peers having this file from tracker
@@ -28,7 +27,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
         std::shared_ptr<Connection> peerConnection = establishConnection(peer.getIp(), peer.getPort(), true);
         peerConnection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
         std::string response = peerConnection.get()->read(9);
-        header = ProtocolUtils::decodeHeader(response.substr(0, 1));
+        ProtocolUtils::decodeHeader(response.substr(0, 1));
         uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
         response = peerConnection.get()->read(size);
 
