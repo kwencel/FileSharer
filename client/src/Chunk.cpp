@@ -3,10 +3,16 @@
 #include <openssl/md5.h>
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
-        id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { } // FIXME NOT ALWAYS TRUE! CHECK IN CONSTRUCTOR IF HASH MATCHES WITH WHAT IS ON DISK
+        id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { };
 
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
-        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash) { }
+        id(id), realSize(realSize), associatedFile(associatedFile), hash(hash) {
+    std::vector<char> tmpData;
+    tmpData = associatedFile->readChunkData(this);
+    if (calculateHashMD5(tmpData) == hash) {
+        downloaded = true;
+    }
+}
 
 unsigned Chunk::getRealSize() const {
     return realSize;
@@ -14,7 +20,9 @@ unsigned Chunk::getRealSize() const {
 
 std::vector<char> &Chunk::getData() {
     if (data.empty()) {
-        // TODO Check if file has this data
+        if (not downloaded) {
+            std::runtime_error("Chunk " + std::to_string(id) + "is not on disk");
+        }
         data = associatedFile->readChunkData(id);
     }
     return data;
@@ -32,6 +40,7 @@ void Chunk::setData(std::vector<char> data) {
     this->downloaded = true;
     associatedFile->notifyChunkDownloaded(id);
     data.clear();
+    data.shrink_to_fit();
 }
 
 unsigned long Chunk::getId() const {

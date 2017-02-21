@@ -31,8 +31,8 @@ int main() {
         perror("Error during socket creation");
     }
 
-    CHK(bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize));
-    CHK(listen(serverSocketDescriptor, 5));
+    CHK_EX(bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize));
+    CHK_EX(listen(serverSocketDescriptor, 5));
 
     while (1) {
         int clientSocketDescriptor = accept(serverSocketDescriptor, (struct sockaddr *) &serverSocket, &socketSize);

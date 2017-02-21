@@ -96,6 +96,10 @@ class File {
 
         std::vector<bool> getDownloadedChunks();
 
+        bool isDownloaded() const;
+
+        unsigned long getDownloadedChunksAmount() const;
+
         FileInfo getFileInfo();
 
         File(File&&) = default;
@@ -107,6 +111,7 @@ class File {
         uintmax_t size;
         std::vector<Chunk *> chunks;
         std::fstream fileStream;
+        unsigned long downloadedChunksAmount = 0;
 
         /**
          * Reads file data from disk.

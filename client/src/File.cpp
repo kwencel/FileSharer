@@ -4,7 +4,7 @@
 #include <openssl/md5.h>
 #include <CustomExceptions.h>
 
-File::File(const std::string &name) { //TODO Save files in files with just name, not by full path
+File::File(const std::string &name) {
     std::string baseName = name.substr(name.find_last_of("/\\") + 1);
     this->name = name;
     this->relativePath = FILES_PATH_PREFIX + name;
@@ -15,14 +15,20 @@ File::File(const std::string &name) { //TODO Save files in files with just name,
         if (boost::filesystem::exists(relativePath + ".meta")) {
             // Partially downloaded file detected. Verify its condition and rebuild chunks info from .meta file
             verify();
+            for (auto &&chunk : chunks) {
+                if (chunk->isDownloaded()) {
+                    ++downloadedChunksAmount;
+                }
+            }
         } else {
             // Assuming the file is fully downloaded and ready to be shared
             LOG(INFO) << "Metadata for " << name << " does not exist";
             size = getRealSize();
             if (size == 0) {
-                std::runtime_error("File size is equal to 0");
+                throw std::runtime_error("File size is equal to 0");
             }
             createChunks();
+            downloadedChunksAmount = getChunksAmount();
             hash = calculateHashMD5(0, size);
         }
         LOG(INFO) << "File " << name << " with size " << size << "B opened";
@@ -36,11 +42,16 @@ File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
     this->relativePath = FILES_PATH_PREFIX + name;
     this->size = fileInfo.getSize();
     this->hash = fileInfo.getHash();
+    boost::filesystem::create_directory(FILES_PATH_PREFIX);
     fileStream.open(relativePath, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
     createChunks(chunksHashes);
+    for (auto &&chunk : chunks) {
+        if (chunk->isDownloaded()) {
+            ++downloadedChunksAmount;
+        }
+    }
     createMeta(chunksHashes);
     LOG(INFO) << "File " << name << " with size " << size << "B created";
-    // TODO Preallocate file
 }
 
 
@@ -98,8 +109,12 @@ unsigned long File::getRealSize() {
 }
 
 void File::notifyChunkDownloaded(unsigned long chunkId) {
-    // TODO Implement lazy saving (waiting for neighbouring chunks and saving them in one or few sequential writes)
     writeChunkData(chunkId);
+    ++downloadedChunksAmount;
+    if (isDownloaded()) {
+        // File is fully downloaded, .meta files is no longer necessary
+        boost::filesystem::remove(relativePath + ".meta");
+    }
 }
 
 void File::writeChunkData(unsigned long chunkId) {
@@ -217,4 +232,12 @@ std::vector<bool> File::getDownloadedChunks() {
 
 FileInfo File::getFileInfo() {
     return FileInfo(getName(), getHash(), getSize(), getDownloadedChunks());
+}
+
+bool File::isDownloaded() const {
+    return downloadedChunksAmount == getChunksAmount();
+}
+
+unsigned long File::getDownloadedChunksAmount() const {
+    return downloadedChunksAmount;
 }
