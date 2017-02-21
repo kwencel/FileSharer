@@ -111,9 +111,11 @@ void MainWindow::getAvailableFilesButtonClicked() {
             QTableWidgetItem *fileSize = new QTableWidgetItem(
                     QString::fromStdString(std::to_string(fileInfo.getSize())));
             QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("100"));
+            QTableWidgetItem *nPeers = new QTableWidgetItem(QString::fromStdString(std::to_string(fileInfo.getNumberOfPeers())));
             ui->availableFilesTableWidget->setItem(row, 0, name);
             ui->availableFilesTableWidget->setItem(row, 1, hash);
             ui->availableFilesTableWidget->setItem(row, 2, fileSize);
+            ui->availableFilesTableWidget->setItem(row, 4, nPeers);
             std::string progressValue = "100";
             if ((progressValue = isFileLocalAndDownloaded(fileInfo)) != "100") {
                 QFont newFont = ui->availableFilesTableWidget->item(row, 0)->font();
@@ -121,6 +123,7 @@ void MainWindow::getAvailableFilesButtonClicked() {
                 ui->availableFilesTableWidget->item(row, 0)->setFont(newFont);
                 ui->availableFilesTableWidget->item(row, 1)->setFont(newFont);
                 ui->availableFilesTableWidget->item(row, 2)->setFont(newFont);
+                ui->availableFilesTableWidget->item(row, 4)->setFont(newFont);
                 progress->setFont(newFont);
             }
             progress->setText(QString::fromStdString(progressValue));

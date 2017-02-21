@@ -15,7 +15,7 @@ class FileInfo {
          * @param hash Hash of the file
          * @param availableChunks Vector of bool values denoting which chunks of the file are available
          */
-        FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks);
+        FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers = 0);
         FileInfo();
 
         friend class boost::serialization::access;
@@ -25,6 +25,7 @@ class FileInfo {
             ar & filename;
             ar & hash;
             ar & size;
+            ar & numberOfPeers;
             ar & availableChunks;
         }
 
@@ -61,6 +62,14 @@ class FileInfo {
         std::string filename;
         std::string hash;
         unsigned long size;
+        unsigned long numberOfPeers;
+    public:
+        unsigned long getNumberOfPeers() const;
+
+    public:
+        void setNumberOfPeers(unsigned long numberOfPeers);
+
+    private:
         std::vector<bool> availableChunks;
 };
 
