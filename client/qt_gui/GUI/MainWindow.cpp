@@ -95,19 +95,21 @@ void MainWindow::getAvailableFilesButtonClicked() {
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
         QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));
         QTableWidgetItem *fileSize = new QTableWidgetItem(QString::fromStdString(std::to_string(fileInfo.getSize())));
-        QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("0"));
+        QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("100"));
         ui->availableFilesTableWidget->setItem(row, 0, name);
         ui->availableFilesTableWidget->setItem(row, 1, hash);
         ui->availableFilesTableWidget->setItem(row, 2, fileSize);
-        ui->availableFilesTableWidget->setItem(row, 3, progress);
-        if (isFileLocalAndDownloaded(fileInfo)) {
+        std::string progressValue = "100";
+        if ( (progressValue = isFileLocalAndDownloaded(fileInfo)) != "100") {
             QFont newFont = ui->availableFilesTableWidget->item(row, 0)->font();
             newFont.setBold(true);
             ui->availableFilesTableWidget->item(row, 0)->setFont(newFont);
             ui->availableFilesTableWidget->item(row, 1)->setFont(newFont);
             ui->availableFilesTableWidget->item(row, 2)->setFont(newFont);
-            ui->availableFilesTableWidget->item(row, 3)->setFont(newFont);
+            progress->setFont(newFont);
         }
+        progress->setText(QString::fromStdString(progressValue));
+        ui->availableFilesTableWidget->setItem(row, 3, progress);
         ++row;
     }
 }
@@ -132,24 +134,44 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 }
 
 void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
-    //float progress = fileHandler->file->getDownloadedChunksAmount()/fileHandler->file->getChunksAmount();
+    LOG(INFO) << "Beginning progress update";
     float progress = 0;
     std::string hash = fileHandler->file->getHash();
 
-    for (unsigned int i = 0; i < 0; ++i) {
-        std::string rowHash = ui->downloadingFilesTableWidget->item(i, 1)->text().toStdString();
+    File *file = fileHandler->file.get();
+    progress = (float) file->getDownloadedChunksAmount() / file->getChunksAmount();
+    progress *= 100;
+
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(0) << progress;
+    std::string stringProgress = stream.str();
+    QString qStringProgress = QString::fromStdString(stringProgress);
+
+    for (unsigned int i = 0; i < ui->availableFilesTableWidget->rowCount(); ++i) {
+        std::string rowHash = ui->availableFilesTableWidget->item(i, 1)->text().toStdString();
         if (rowHash == hash) {
-            ui->downloadingFilesTableWidget->item(i, 3)->setText(QString::fromStdString(std::to_string(progress)));
+            ui->availableFilesTableWidget->item(i, 3)->setText(qStringProgress);
+            if (stringProgress == "100") {
+                ui->availableFilesTableWidget->item(i,3)->font().setBold(false);
+            }
             break;
         }
     }
 }
 
-bool MainWindow::isFileLocalAndDownloaded(FileInfo fileInfo) {
-    for(auto fileSharedPtr : cm.getFileHandlers()) {
-        if (fileSharedPtr.get()->file->getHash() == fileInfo.getHash() && fileSharedPtr.get()->file->isDownloaded()) {
-            return true;
+std::string MainWindow::isFileLocalAndDownloaded(FileInfo fileInfo) {
+    float progress = 0.0f;
+    std::string result = "0";
+    for (auto fileSharedPtr : cm.getFileHandlers()) {
+        if (fileSharedPtr.get()->file->getHash() == fileInfo.getHash()) {
+            File *file = fileSharedPtr.get()->file.get();
+            progress = (float) file->getDownloadedChunksAmount() / file->getChunksAmount();
+            progress *= 100;
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(0) << progress;
+            result = stream.str();
         }
     }
-    return false;
+    return result;
 }
+
