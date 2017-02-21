@@ -23,6 +23,18 @@
     } \
 } while (0)
 
+#define CHK_MSG_EX(x, y) do { \
+    int retval = (x); \
+    if (retval != 0) { \
+        LOG(ERROR) << "Runtime error: " << #x << " returned " << retval << " at " << __FILE__ << ":" << __LINE__; \
+        perror(y); \
+        throw std::runtime_error(std::string(y) + " failed"); \
+    } else { \
+        LOG(INFO) << y << " successful"; \
+    } \
+} while (0)
+
+
 #define CHK_POS(x) do { \
     int retval = (x); \
     if (retval < 0) { \

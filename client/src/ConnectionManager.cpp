@@ -13,7 +13,7 @@ ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocket.sin_port = htons(bindPort);
     ownSocket.sin_addr.s_addr = inet_addr(bindIP.c_str());
     ownSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-    CHK_MSG(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)),
+    CHK_MSG_EX(bind(ownSocketDescriptor, (sockaddr *)&ownSocket, sizeof(ownSocket)),
             std::string("ConnectionManager bind to " + getOwnIP() + ":" + std::to_string(getOwnPort())).c_str());
     epollDescriptor = epoll_create(1);
 }
@@ -87,6 +87,9 @@ void ConnectionManager::listenLoop() {
 }
 
 ConnectionManager::~ConnectionManager() {
+//    for (auto &&connection : connections) {
+//        connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_CONNECTION_CLOSE));
+//    }
     close(epollDescriptor);
 }
 
@@ -130,7 +133,12 @@ void ConnectionManager::processIncomingConnections() {
 void ConnectionManager::removeConnection(Connection *connection) {
 //    epoll_ctl(epollDescriptor, EPOLL_CTL_DEL, connection.get()->peerSocketDescriptor, )
     connectionsMutex.lock();
-    connections.erase(std::shared_ptr<Connection>(connection)); // FIXME verify if it's working
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        if ((*it).get() == connection) {
+            connections.erase(it);
+            break;
+        }
+    }
     connectionsMutex.unlock();
 }
 

@@ -6,6 +6,10 @@
 #include "TrackerProtocolTranslator.h"
 #include <boost/serialization/vector.hpp>
 #include <ProtocolUtils.h>
+#include <ErrorCheckUtils.h>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -23,9 +27,12 @@ int main() {
     serverSocket.sin_port = htons(TRACKER_BIND_PORT);
     serverSocket.sin_addr.s_addr = inet_addr(TRACKER_BIND_IP);
     int serverSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocketDescriptor == -1) {
+        perror("Error during socket creation");
+    }
 
-    bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize);
-    listen(serverSocketDescriptor, 10);
+    CHK(bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize));
+    CHK(listen(serverSocketDescriptor, 5));
 
     while (1) {
         int clientSocketDescriptor = accept(serverSocketDescriptor, (struct sockaddr *) &serverSocket, &socketSize);
@@ -45,3 +52,4 @@ int main() {
 
     return 0;
 }
+#pragma clang diagnostic pop

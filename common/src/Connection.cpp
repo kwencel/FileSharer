@@ -4,7 +4,6 @@
 #include "Connection.h"
 #include <unistd.h>
 #include <CustomExceptions.h>
-#include <sys/time.h>
 
 Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocket.sin_family = AF_INET;
@@ -30,6 +29,12 @@ uint16_t Connection::getPeerPort() {
     return ntohs(peerSocket.sin_port);
 }
 
+std::string Connection::getPeerIPandPort() {
+    std::stringstream ss;
+    ss << getPeerIP() << ":" << getPeerPort();
+    return ss.str();
+}
+
 Connection::~Connection() {
     close(peerSocketDescriptor);
 }
@@ -39,9 +44,6 @@ ssize_t Connection::write(std::string data) {
 }
 
 std::string Connection::read(size_t howMany, time_t timeout) {
-    if (howMany > RECEIVE_BUFFER) {
-        LOG(DEBUG) << "Requested read won't fit into receiving buffer. Fallback to safe buffer length value.";
-    }
     std::string data;
     ssize_t readBytes = 0;
     size_t toRead;
@@ -60,12 +62,12 @@ std::string Connection::read(size_t howMany, time_t timeout) {
             toRead = howMany;
         }
         readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
-        while (errno == EAGAIN && retries < READ_RETRIES) {
+        while (errno == EWOULDBLOCK && retries < READ_RETRIES) {
             ++retries;
             LOG(WARNING) << "Read() timeout - retry attempt " + std::to_string(retries);
             readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
         }
-        if (errno == EAGAIN) {
+        if (errno == EWOULDBLOCK) {
             throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort()); //TODO test read timeout
         }
         if (readBytes == -1) {

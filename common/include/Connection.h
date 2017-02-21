@@ -11,7 +11,6 @@
 //TODO change CMakeLists to include this with just the header name
 
 class ConnectionManager;
-//class Observer;
 
 class Connection {
     friend class ConnectionManager;
@@ -44,6 +43,8 @@ class Connection {
          * @return Peer's port
          */
         uint16_t getPeerPort();
+
+        std::string getPeerIPandPort();
 
         /**
          * Sends given data to peer

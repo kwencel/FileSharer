@@ -9,6 +9,7 @@
 #include <map>
 #include <PeerFile.h>
 #include "File.h"
+#include <mutex>
 
 class File;
 
@@ -24,7 +25,7 @@ class FileHandler : public Observer {
 
         void beginDownload();
 
-        std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort);
+        std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort, bool dontRegister = false);
 
         void addConnection(std::shared_ptr<Connection> connection);
 
@@ -46,10 +47,11 @@ class FileHandler : public Observer {
          */
         std::map<std::string, std::shared_ptr<Connection>> connections;
 
-        void receiveChunk(Connection *connection);
+        uint64_t receiveChunk(Connection *connection);
 
         std::vector<PeerFile> peersWithFile;
         FileInfo fileInfo;
+        std::mutex updateMutex;
 };
 
 
