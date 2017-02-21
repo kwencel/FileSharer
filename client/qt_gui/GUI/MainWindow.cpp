@@ -100,6 +100,14 @@ void MainWindow::getAvailableFilesButtonClicked() {
         ui->availableFilesTableWidget->setItem(row, 1, hash);
         ui->availableFilesTableWidget->setItem(row, 2, fileSize);
         ui->availableFilesTableWidget->setItem(row, 3, progress);
+        if (isFileLocalAndDownloaded(fileInfo)) {
+            QFont newFont = ui->availableFilesTableWidget->item(row, 0)->font();
+            newFont.setBold(true);
+            ui->availableFilesTableWidget->item(row, 0)->setFont(newFont);
+            ui->availableFilesTableWidget->item(row, 1)->setFont(newFont);
+            ui->availableFilesTableWidget->item(row, 2)->setFont(newFont);
+            ui->availableFilesTableWidget->item(row, 3)->setFont(newFont);
+        }
         ++row;
     }
 }
@@ -124,7 +132,8 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 }
 
 void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
-    float progress = fileHandler->file->getDownloadedChunksAmount()/fileHandler->file->getChunksAmount();
+    //float progress = fileHandler->file->getDownloadedChunksAmount()/fileHandler->file->getChunksAmount();
+    float progress = 0;
     std::string hash = fileHandler->file->getHash();
 
     for (unsigned int i = 0; i < 0; ++i) {
@@ -134,4 +143,13 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
             break;
         }
     }
+}
+
+bool MainWindow::isFileLocalAndDownloaded(FileInfo fileInfo) {
+    for(auto fileSharedPtr : cm.getFileHandlers()) {
+        if (fileSharedPtr.get()->file->getHash() == fileInfo.getHash() && fileSharedPtr.get()->file->isDownloaded()) {
+            return true;
+        }
+    }
+    return false;
 }

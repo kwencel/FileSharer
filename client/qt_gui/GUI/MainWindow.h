@@ -28,6 +28,7 @@ public:
 private:
         std::vector<std::shared_ptr<FileHandler>> scanLocalFiles();
         void insertLocalFiles();
+        bool isFileLocalAndDownloaded(FileInfo fileInfo);
         std::vector<FileInfo> getLocalFileInfos();
 
         Ui::MainWindow *ui;
