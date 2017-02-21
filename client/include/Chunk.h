@@ -97,7 +97,7 @@ class Chunk {
         /**
          * Pointer to file associated with the chunk.
          */
-        File *associatedFile; // TODO Replace with Observer pattern
+        File *associatedFile;
 
         /**
          * Vector containing actual chunk data. It acts as a buffer, if the data
