@@ -11,10 +11,12 @@
 namespace SerializationHelper {
 
     /**
-     * Serializes an object of type given as template argument to std::string
+     * Serializes a message consisting of a header and an object. Automatically inserts
+     * serialized object size after the header (as string).
      * @tparam T Type of object to be serialized
-     * @param object Object to be serialized
-     * @return Serialized object in the form of std::string
+     * @param header Header of the message
+     * @param object Instance of class T
+     * @return String that represents serialized data (header-size-object)
      */
     template<typename T>
     static std::string serialize(char header, T object) {
@@ -33,10 +35,10 @@ namespace SerializationHelper {
     }
 
     /**
-     * Deserializes an std::string to a object of type given as template argument
-     * @tparam T Type of object that will be the result of deserialization
-     * @param serializedObject String to deserialize
-     * @return Deserialized object of type T
+     * Deserializes an object from a given string
+     * @tparam T Type of object to be deserialized
+     * @param serializedObject String to be deserialized
+     * @return Returns an instance of class T obtained from deserialization
      */
     template<typename T>
     static T deserialize(std::string &serializedObject) {

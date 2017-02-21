@@ -20,20 +20,26 @@ class PeerManager {
         bool addPeer(Peer peer);
 
         /**
-         *
-         * @param hash Hash of the file that will be searched for
-         * @return Vector of pairs of ip of peer with the file and a vector of bool denoting which
-         * chunks are available
+         * Constructs a vector that contains a PeerFile instance for every peer that has a file identified by hash
+         * @param hash Hash of the file in question
+         * @return Vector of type PeerFile that contains ip, port and a vector of available chunks for every peer
+         * that has the file in question
          */
         std::vector<PeerFile> getPeersWithFile(std::string hash);
 
         /**
-         * Find all distinct files (by hash) among all peers
+         * Finds all distinct files (by hash) among all peers
          * @return Unordered set of FileInfo instances with unique hashes
          */
         std::vector<FileInfo> getDistinctFiles();
     private:
-        boost::optional<Peer*> isPeerAdded(std::string ip, uint16_t);
+        /**
+         * Checks if a peer with the same ip and port was already added
+         * @param ip Ip of newly registered peer
+         * @param port Port of newly registered peer
+         * @return Pointer to a corresponding Peer instance if it was found. Else boost::none
+         */
+        boost::optional<Peer*> isPeerAdded(std::string ip, uint16_t port);
         std::vector<Peer> peerList;
 };
 
