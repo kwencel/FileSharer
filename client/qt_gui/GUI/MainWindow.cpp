@@ -117,8 +117,9 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 //    std::string encodedPeersWithFile = tracker.read(size);
 //    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
     FileInfo fileInfo = availableFiles[row];
-    FileHandler* newFileHandler = new FileHandler(fileInfo);
-    connect(newFileHandler, SIGNAL(updateFileHandlerProgress(FileHandler*)), this, SLOT(updateFileDownloadProgress(FileHandler*)));
+    std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
+    cm.addFileHandler(newFileHandler);
+    connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler*)), this, SLOT(updateFileDownloadProgress(FileHandler*)));
     newFileHandler->beginDownload();
 }
 

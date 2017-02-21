@@ -62,12 +62,12 @@ std::string Connection::read(size_t howMany, time_t timeout) {
             toRead = howMany;
         }
         readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
-        while (errno == EWOULDBLOCK && retries < READ_RETRIES) {
+        while (readBytes == 0 && retries < READ_RETRIES) {
             ++retries;
             LOG(WARNING) << "Read() timeout - retry attempt " + std::to_string(retries);
             readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
         }
-        if (errno == EWOULDBLOCK) {
+        if (retries == READ_RETRIES) {
             throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort()); //TODO test read timeout
         }
         if (readBytes == -1) {

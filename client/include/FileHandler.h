@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <map>
 #include <PeerFile.h>
-#include <QtCore/QObject>
+#include <QObject>
 #include "File.h"
 #include <mutex>
 
