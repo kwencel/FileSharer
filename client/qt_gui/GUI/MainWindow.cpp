@@ -6,6 +6,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include <TrackerHandler.h>
+#include <QMessageBox>
+#include <CustomExceptions.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     insertLocalFiles();
     cm.listenLoop();
     cm.processIncomingConnections();
+    this->informTrackerButtonClicked();
+    this->getAvailableFilesButtonClicked();
 }
 
 MainWindow::~MainWindow()
@@ -81,51 +85,59 @@ std::vector<FileInfo> MainWindow::getLocalFileInfos() {
 
 
 void MainWindow::informTrackerButtonClicked() {
-    std::vector<FileInfo> localFileInfoVector = this->getLocalFileInfos();
-    std::string response = TrackerHandler::registerToTracker(cm.getOwnIP(), cm.getOwnPort(), localFileInfoVector);
+    try {
+        std::vector<FileInfo> localFileInfoVector = this->getLocalFileInfos();
+        std::string response = TrackerHandler::registerToTracker(cm.getOwnIP(), cm.getOwnPort(), localFileInfoVector);
+    } catch (ConnectionError e) {
+        std::string s(e.what());
+        s = "Cannot register to tracker. " + s;
+        QMessageBox::warning(
+                this,
+                tr("Error"),
+                QString::fromStdString(s));
+    }
 }
 
 void MainWindow::getAvailableFilesButtonClicked() {
-    availableFiles = TrackerHandler::getAvailableFiles();
-    ui->availableFilesTableWidget->setRowCount(0);
-    int row = 0;
+    try {
+        availableFiles = TrackerHandler::getAvailableFiles();
+        ui->availableFilesTableWidget->setRowCount(0);
+        int row = 0;
 
-    for (FileInfo &fileInfo : availableFiles) {
-        ui->availableFilesTableWidget->insertRow(row);
-        QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
-        QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));
-        QTableWidgetItem *fileSize = new QTableWidgetItem(QString::fromStdString(std::to_string(fileInfo.getSize())));
-        QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("100"));
-        ui->availableFilesTableWidget->setItem(row, 0, name);
-        ui->availableFilesTableWidget->setItem(row, 1, hash);
-        ui->availableFilesTableWidget->setItem(row, 2, fileSize);
-        std::string progressValue = "100";
-        if ( (progressValue = isFileLocalAndDownloaded(fileInfo)) != "100") {
-            QFont newFont = ui->availableFilesTableWidget->item(row, 0)->font();
-            newFont.setBold(true);
-            ui->availableFilesTableWidget->item(row, 0)->setFont(newFont);
-            ui->availableFilesTableWidget->item(row, 1)->setFont(newFont);
-            ui->availableFilesTableWidget->item(row, 2)->setFont(newFont);
-            progress->setFont(newFont);
+        for (FileInfo &fileInfo : availableFiles) {
+            ui->availableFilesTableWidget->insertRow(row);
+            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
+            QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));
+            QTableWidgetItem *fileSize = new QTableWidgetItem(
+                    QString::fromStdString(std::to_string(fileInfo.getSize())));
+            QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("100"));
+            ui->availableFilesTableWidget->setItem(row, 0, name);
+            ui->availableFilesTableWidget->setItem(row, 1, hash);
+            ui->availableFilesTableWidget->setItem(row, 2, fileSize);
+            std::string progressValue = "100";
+            if ((progressValue = isFileLocalAndDownloaded(fileInfo)) != "100") {
+                QFont newFont = ui->availableFilesTableWidget->item(row, 0)->font();
+                newFont.setBold(true);
+                ui->availableFilesTableWidget->item(row, 0)->setFont(newFont);
+                ui->availableFilesTableWidget->item(row, 1)->setFont(newFont);
+                ui->availableFilesTableWidget->item(row, 2)->setFont(newFont);
+                progress->setFont(newFont);
+            }
+            progress->setText(QString::fromStdString(progressValue));
+            ui->availableFilesTableWidget->setItem(row, 3, progress);
+            ++row;
         }
-        progress->setText(QString::fromStdString(progressValue));
-        ui->availableFilesTableWidget->setItem(row, 3, progress);
-        ++row;
+    } catch (ConnectionError e) {
+        std::string s(e.what());
+        s = "Cannot check tracker for available files. " + s;
+        QMessageBox::warning(
+                this,
+                tr("Error"),
+                QString::fromStdString(s));
     }
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-//    LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
-//    char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
-//    std::string hash  = cm.fileHandlers[row].get()->file.get()->getHash();
-//    std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, hash);
-//    Connection tracker(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-//    tracker.write(message);
-//    std::string first9bytes = tracker.read(9);
-//    header = ProtocolUtils::decodeHeader(first9bytes.substr(0,1));
-//    uint64_t size = ProtocolUtils::decodeSize(first9bytes.substr(1,8));
-//    std::string encodedPeersWithFile = tracker.read(size);
-//    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
     FileInfo fileInfo = availableFiles[row];
     std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
     cm.addFileHandler(newFileHandler);
