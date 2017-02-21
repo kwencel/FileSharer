@@ -1,9 +1,10 @@
 #include "FileInfo.h"
 
-FileInfo::FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks) {
+FileInfo::FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers) {
     this->filename = filename;
     this->hash = hash;
     this->size = size;
+    this->numberOfPeers = numberOfPeers;
     this->availableChunks = availableChunks;
 }
 
@@ -38,6 +39,14 @@ uint64_t FileInfo::getSize() const {
 
 std::vector<bool> FileInfo::getAvailableChunks() const {
     return this->availableChunks;
+}
+
+void FileInfo::setNumberOfPeers(unsigned long numberOfPeers) {
+    this->numberOfPeers = numberOfPeers;
+}
+
+unsigned long FileInfo::getNumberOfPeers() const {
+    return numberOfPeers;
 }
 
 

@@ -36,6 +36,10 @@ std::string TrackerProtocolTranslator::generateResponse(char header, std::string
     }
     else if (header == PROTOCOL_HEADER_LIST_FILES) {
         std::vector<FileInfo> distinctFiles = peerManager.getDistinctFiles();
+        for(FileInfo &fi : distinctFiles) {
+            std::vector<PeerFile> peersForCheckNumber = peerManager.getPeersWithFile(fi.getHash());
+            fi.setNumberOfPeers(peersForCheckNumber.size());
+        }
         std::string distinctFilesInfo = SerializationHelper::serialize<std::vector<FileInfo>>(header, distinctFiles);
         return distinctFilesInfo;
     }
