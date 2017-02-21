@@ -152,7 +152,11 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
         if (rowHash == hash) {
             ui->availableFilesTableWidget->item(i, 3)->setText(qStringProgress);
             if (stringProgress == "100") {
-                ui->availableFilesTableWidget->item(i,3)->font().setBold(false);
+                QFont newFont = ui->availableFilesTableWidget->item(i,3)->font();
+                newFont.setBold(false);
+                for (unsigned int j = 0; j < ui->availableFilesTableWidget->columnCount(); ++j) {
+                    ui->availableFilesTableWidget->item(i, j)->setFont(newFont);
+                }
             }
             break;
         }
