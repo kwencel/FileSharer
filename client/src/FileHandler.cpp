@@ -149,10 +149,13 @@ void FileHandler::beginDownload() {
                     loads.push_back(peerLoads[peerIndex]);
                 }
             }
-            long lowestLoadPosition = std::distance(loads.begin(), std::min_element(loads.begin(), loads.end()));
-            long lowestLoadPeerIndex = indexes[lowestLoadPosition];
-            requestChunk(peersWithFile[lowestLoadPeerIndex].getIp(), peersWithFile[lowestLoadPeerIndex].getPort(), id);
-            peerLoads[lowestLoadPeerIndex]++;
+            if (loads.size() != 0) {
+                long lowestLoadPosition = std::distance(loads.begin(), std::min_element(loads.begin(), loads.end()));
+                long lowestLoadPeerIndex = indexes[lowestLoadPosition];
+                requestChunk(peersWithFile[lowestLoadPeerIndex].getIp(), peersWithFile[lowestLoadPeerIndex].getPort(),
+                             id);
+                peerLoads[lowestLoadPeerIndex]++;
+            }
         }
     }
 }
