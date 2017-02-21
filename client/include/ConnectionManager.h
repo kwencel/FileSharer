@@ -12,7 +12,14 @@
 
 class ConnectionManager {
     public:
-        static ConnectionManager &getInstance(std::string bindIP  = CLIENT_BIND_IP, uint16_t bindPort = CLIENT_BIND_PORT);
+        /**
+         * Constructs the Singleton ConnectionManager instance. Both parameters are optional
+         * for convenient usage. The first call to this function need the parameters filled however.
+         * @param bindIP Placeholder value for making parameter optional
+         * @param bindPort Placeholder value for making parameter optional
+         * @return One and the only instance of ConnectionManager
+         */
+        static ConnectionManager &getInstance(std::string bindIP  = "", uint16_t bindPort = 0);
 
         sockaddr_in getOwnSocket();
         std::string getOwnIP();
@@ -30,6 +37,9 @@ class ConnectionManager {
         void addFileHandler(std::shared_ptr<FileHandler> newFileHandler);
         void setFileHandlers(std::vector<std::shared_ptr<FileHandler>> fileHandlers);
         const std::vector<std::shared_ptr<FileHandler>>& getFileHandlers() const;
+        void setTrackerDetails(std::string trackerIP, uint16_t trackerPort);
+        const std::string getTrackerIP() const;
+        uint16_t getTrackerPort() const;
 
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);
@@ -42,9 +52,12 @@ class ConnectionManager {
         std::vector<std::shared_ptr<FileHandler>> fileHandlers;
         std::mutex fileHandlersMutex;
 
+    private:
+        uint16_t trackerPort;
+        std::string trackerIP;
+
         ConnectionManager() = delete;
         ConnectionManager(const ConnectionManager &) = delete;
-//        ConnectionManager& operator=(const ConnectionManager&) = delete;
         int epollDescriptor;
 
         bool notifyFileAboutNewConnection(std::shared_ptr<Connection> connection);

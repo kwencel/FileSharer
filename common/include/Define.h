@@ -1,8 +1,6 @@
 #ifndef FILESHARER_DEFINE_H
 #define FILESHARER_DEFINE_H
 
-#include "NetworkSettings.h"
-
 //CLIENT
 
 #define CHUNK_SIZE_KB       128
