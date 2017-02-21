@@ -48,7 +48,6 @@ class Chunk {
          * disk.
          * @return Data contained within the chunk
          */
-        // TODO Implement caching mechanism (lazy initialization, remove from cache if not used recently / RAM overused
         std::vector<char> &getData();
 
         /**
@@ -66,10 +65,15 @@ class Chunk {
          */
         bool isDownloaded() const;
 
+        /**
+         * @return True if Chunk data is cached in a @a data field
+         */
         bool isCached() const;
 
+        /**
+         * Clears the cached Chunk data from RAM
+         */
         void clearCache();
-
 
 
     private:
@@ -106,9 +110,6 @@ class Chunk {
          * Indicates if the chunk contains the valid data.
          */
         bool downloaded = false;
-
-
-    private:
 
         /**
          * Calculates the MD5 hash of the data provided in a @a buffer

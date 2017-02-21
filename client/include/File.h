@@ -31,6 +31,9 @@ class File {
          */
         File(FileInfo fileInfo, std::vector<std::string> chunksHashes);
 
+        /**
+         * Deletes all Chunks from memory and closes the fileStream
+         */
         ~File();
 
         /**
@@ -94,12 +97,25 @@ class File {
          */
         std::vector<std::string> getChunksHashes();
 
+        /**
+         * @return Vector of bools indicating which chunk has been already downloaded. True on index @a i means
+         * the chunk of index @a i has been downloaded.
+         */
         std::vector<bool> getDownloadedChunks();
 
+        /**
+         * @return True if the Chunk is already downloaded
+         */
         bool isDownloaded() const;
 
+        /**
+         * @return Amount of chunks that are already downloaded
+         */
         unsigned long getDownloadedChunksAmount() const;
 
+        /**
+         * @return FileInfo object based on the properties of the File.
+         */
         FileInfo getFileInfo();
 
         File(File&&) = default;
@@ -173,6 +189,10 @@ class File {
          */
         void verify();
 
+        /**
+         * Checks if the data cached in all File's Chunks exceed the memory set memory threshold. If it does,
+         * all Chunk's cached data is cleared and if necessary - it will have to be fetched from disk
+         */
         void checkMemoryLimit();
 };
 

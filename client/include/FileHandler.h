@@ -11,6 +11,7 @@
 #include <QObject>
 #include "File.h"
 #include <mutex>
+#include <memory>
 
 class File;
 
@@ -56,7 +57,6 @@ class FileHandler :  public QObject, public Observer {
 
         std::vector<PeerFile> peersWithFile;
         FileInfo fileInfo;
-        std::mutex updateMutex;
 };
 
 

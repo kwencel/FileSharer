@@ -1,5 +1,4 @@
 #include <dnet.h>
-// TODO replace dnet.h with sth more commonly installed
 #include <iostream>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
@@ -77,7 +76,6 @@ void ConnectionManager::listenLoop() {
             if (!notifyFileAboutNewConnection(conn)) {
                 // Appropriate file now found
                 LOG(DEBUG) << "Connecion would be closed";
-//                close(peerSocketDescriptor);
                 continue;
             }
             connectionsMutex.lock();
@@ -88,15 +86,11 @@ void ConnectionManager::listenLoop() {
 }
 
 ConnectionManager::~ConnectionManager() {
-//    for (auto &&connection : connections) {
-//        connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_CONNECTION_CLOSE));
-//    }
     close(epollDescriptor);
 }
 
 std::unordered_set<std::shared_ptr<Connection>> ConnectionManager::getActiveConnections() {
     connectionsMutex.lock();
-    // TODO Ping every client to make sure connection is active - remove inactive connections from set
     std::unordered_set<std::shared_ptr<Connection>> connections = this->connections;
     connectionsMutex.unlock();
     return connections;
@@ -132,7 +126,6 @@ void ConnectionManager::processIncomingConnections() {
 }
 
 void ConnectionManager::removeConnection(Connection *connection) {
-//    epoll_ctl(epollDescriptor, EPOLL_CTL_DEL, connection.get()->peerSocketDescriptor, )
     connectionsMutex.lock();
     for (auto it = connections.begin(); it != connections.end(); ++it) {
         if ((*it).get() == connection) {
