@@ -5,6 +5,7 @@
 #include <ClientProtocolTranslator.h>
 #include <bitset>
 #include <TrackerHandler.h>
+#include <QtCore/QMetaObject>
 #include <boost/filesystem/operations.hpp>
 
 FileHandler::FileHandler(std::string name) {
@@ -58,6 +59,7 @@ void FileHandler::update(Connection* connection) {
         case PROTOCOL_PEER_SEND_CHUNK: {
             uint64_t chunkId = receiveChunk(connection);
             LOG(INFO) << connection->getPeerIPandPort() << " sent a chunk " << chunkId << " data";
+            updateProgress();
             break;
         }
         case PROTOCOL_PEER_CONNECTION_CLOSE: {
@@ -153,4 +155,8 @@ void FileHandler::beginDownload() {
             peerLoads[lowestLoadPeerIndex]++;
         }
     }
+}
+
+void FileHandler::updateProgress() {
+    emit updateFileHandlerProgress(this);
 }

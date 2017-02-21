@@ -23,6 +23,7 @@ public:
         void getAvailableFilesButtonClicked();
         void informTrackerButtonClicked();
         void trackerFileRowDoubleClicked(int row, int column);
+        void updateFileDownloadProgress(FileHandler* fileHandler);
 
 private:
         std::vector<std::shared_ptr<FileHandler>> scanLocalFiles();

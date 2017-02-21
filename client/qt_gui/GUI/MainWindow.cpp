@@ -95,9 +95,11 @@ void MainWindow::getAvailableFilesButtonClicked() {
         QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(fileInfo.getName()));
         QTableWidgetItem *hash = new QTableWidgetItem(QString::fromStdString(fileInfo.getHash()));
         QTableWidgetItem *fileSize = new QTableWidgetItem(QString::fromStdString(std::to_string(fileInfo.getSize())));
+        QTableWidgetItem *progress = new QTableWidgetItem(QString::fromStdString("0"));
         ui->availableFilesTableWidget->setItem(row, 0, name);
         ui->availableFilesTableWidget->setItem(row, 1, hash);
         ui->availableFilesTableWidget->setItem(row, 2, fileSize);
+        ui->availableFilesTableWidget->setItem(row, 3, progress);
         ++row;
     }
 }
@@ -116,5 +118,19 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 //    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
     FileInfo fileInfo = availableFiles[row];
     FileHandler* newFileHandler = new FileHandler(fileInfo);
+    connect(newFileHandler, SIGNAL(updateFileHandlerProgress(FileHandler*)), this, SLOT(updateFileDownloadProgress(FileHandler*)));
     newFileHandler->beginDownload();
+}
+
+void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
+    float progress = fileHandler->file->getDownloadedChunksAmount()/fileHandler->file->getChunksAmount();
+    std::string hash = fileHandler->file->getHash();
+
+    for (unsigned int i = 0; i < 0; ++i) {
+        std::string rowHash = ui->downloadingFilesTableWidget->item(i, 1)->text().toStdString();
+        if (rowHash == hash) {
+            ui->downloadingFilesTableWidget->item(i, 3)->setText(QString::fromStdString(std::to_string(progress)));
+            break;
+        }
+    }
 }

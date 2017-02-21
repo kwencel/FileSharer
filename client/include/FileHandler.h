@@ -8,12 +8,14 @@
 #include <unordered_set>
 #include <map>
 #include <PeerFile.h>
+#include <QtCore/QObject>
 #include "File.h"
 #include <mutex>
 
 class File;
 
-class FileHandler : public Observer {
+class FileHandler :  public QObject, public Observer {
+        Q_OBJECT
     public:
         FileHandler(FileInfo fileInfo);
 
@@ -39,6 +41,9 @@ class FileHandler : public Observer {
 
         std::unique_ptr<File> file;
 
+    signals:
+        void updateFileHandlerProgress(FileHandler* fileHandler);
+
     private:
         /**
          * Stores connections to peers that has some chunks of the file
@@ -48,6 +53,8 @@ class FileHandler : public Observer {
         std::map<std::string, std::shared_ptr<Connection>> connections;
 
         uint64_t receiveChunk(Connection *connection);
+
+        void updateProgress();
 
         std::vector<PeerFile> peersWithFile;
         FileInfo fileInfo;
