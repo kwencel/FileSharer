@@ -112,6 +112,10 @@ void File::notifyChunkDownloaded(unsigned long chunkId) {
     writeChunkData(chunkId);
     ++downloadedChunksAmount;
     if (isDownloaded()) {
+        // File is fully downloaded, verify global hash
+        if (calculateHashMD5(0, getRealSize()) != hash) {
+            throw std::runtime_error("Global file hash mismatch!");
+        }
         // File is fully downloaded, .meta files is no longer necessary
         boost::filesystem::remove(relativePath + ".meta");
     }

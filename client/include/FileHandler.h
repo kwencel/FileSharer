@@ -23,8 +23,6 @@ class FileHandler :  public QObject, public Observer {
 
         virtual void update(Connection*) override;
 
-        void download();
-
         void beginDownload();
 
         std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort, bool dontRegister = false);

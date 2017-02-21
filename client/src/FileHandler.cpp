@@ -5,7 +5,6 @@
 #include <ClientProtocolTranslator.h>
 #include <bitset>
 #include <TrackerHandler.h>
-#include <QtCore/QMetaObject>
 #include <boost/filesystem/operations.hpp>
 
 FileHandler::FileHandler(std::string name) {
@@ -72,10 +71,6 @@ void FileHandler::update(Connection* connection) {
             LOG(ERROR) << "Unknown header " << std::bitset<8>(static_cast<unsigned long long>(header));
             break;
     }
-}
-
-void FileHandler::download() {
-
 }
 
 std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP, uint16_t peerPort, bool dontRegister) {

@@ -115,17 +115,6 @@ void MainWindow::getAvailableFilesButtonClicked() {
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-//    LOG(INFO) << "Row: " + std::to_string(row) + ", column: " + std::to_string(column) + " clicked";
-//    char header = PROTOCOL_HEADER_PEERS_WITH_FILE;
-//    std::string hash  = cm.fileHandlers[row].get()->file.get()->getHash();
-//    std::string message = ClientProtocolTranslator::generateMessage<std::string>(header, hash);
-//    Connection tracker(TRACKER_BIND_IP, TRACKER_BIND_PORT);
-//    tracker.write(message);
-//    std::string first9bytes = tracker.read(9);
-//    header = ProtocolUtils::decodeHeader(first9bytes.substr(0,1));
-//    uint64_t size = ProtocolUtils::decodeSize(first9bytes.substr(1,8));
-//    std::string encodedPeersWithFile = tracker.read(size);
-//    std::vector<PeerFile> peersWithFile = ClientProtocolTranslator::decodeMessage<std::vector<PeerFile>>(encodedPeersWithFile);
     FileInfo fileInfo = availableFiles[row];
     std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
     cm.addFileHandler(newFileHandler);

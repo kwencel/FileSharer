@@ -23,7 +23,6 @@ int main(int argc, char *argv[]) {
     ConnectionManager::getInstance(clientBindIP, clientBindPort);
     ConnectionManager::getInstance().setTrackerDetails(trackerIP, trackerPort);
 
-    std::cout << QT_VERSION_STR;
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
