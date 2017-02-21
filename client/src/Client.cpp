@@ -7,20 +7,21 @@
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[]) {
-//    File sinewave("example_file.flac");
-//
-//    File kopia("kopia_chunked.flac", sinewave.getRealSize(), sinewave.getHash(), sinewave.getChunksHashes());
-//
-//    std::vector<Chunk *> kopiaChunks = kopia.getChunks();
-//
-//    for (unsigned long i = 0; i < kopia.getChunksAmount(); ++i) {
-//        kopiaChunks[i]->setData(sinewave.readChunkData(i));
-//    }
 
-    std::string ip = argv[1];
-    uint16_t port = (uint16_t) atoi(argv[2]);
-    std::cout << port << std::endl;
-    ConnectionManager &cm = ConnectionManager::getInstance(ip, port);
+    if (argc < 3) {
+        std::cerr << "FileSharer Client - simple P2P file-sharing program." << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <tracker_public_ip> <tracker_port> <client_bind_ip> <client_bind_port>" << std::endl;
+        return -1;
+    }
+
+    std::string clientBindIP = argv[3];
+    uint16_t clientBindPort = static_cast<uint16_t>(atoi(argv[4]));
+
+    std::string trackerIP = argv[1];
+    uint16_t trackerPort = static_cast<uint16_t>(atoi(argv[2]));
+
+    ConnectionManager::getInstance(clientBindIP, clientBindPort);
+    ConnectionManager::getInstance().setTrackerDetails(trackerIP, trackerPort);
 
     std::cout << QT_VERSION_STR;
     QApplication a(argc, argv);

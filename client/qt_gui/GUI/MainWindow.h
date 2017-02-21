@@ -32,8 +32,7 @@ private:
         std::vector<FileInfo> getLocalFileInfos();
 
         Ui::MainWindow *ui;
-        ConnectionManager &cm = ConnectionManager::getInstance(CLIENT_BIND_IP, CLIENT_BIND_PORT);
-        int bindPort = CLIENT_BIND_PORT;
+        ConnectionManager &cm = ConnectionManager::getInstance();
         std::vector<FileInfo> availableFiles;
 };
 

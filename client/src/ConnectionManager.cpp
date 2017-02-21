@@ -8,6 +8,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     ownSocket.sin_family = AF_INET;
     ownSocket.sin_port = htons(bindPort);
@@ -157,5 +158,19 @@ void ConnectionManager::setFileHandlers(std::vector<std::shared_ptr<FileHandler>
 const std::vector<std::shared_ptr<FileHandler>>& ConnectionManager::getFileHandlers() const {
     return this->fileHandlers;
 }
+
+void ConnectionManager::setTrackerDetails(std::string trackerIP, uint16_t trackerPort) {
+    this->trackerIP = trackerIP;
+    this->trackerPort = trackerPort;
+}
+
+const std::string ConnectionManager::getTrackerIP() const {
+    return trackerIP;
+}
+
+uint16_t ConnectionManager::getTrackerPort() const {
+    return trackerPort;
+}
+
 
 #pragma clang diagnostic pop

@@ -2,10 +2,11 @@
 #include <TrackerHandler.h>
 #include <Peer.h>
 #include <ClientProtocolTranslator.h>
+#include <ConnectionManager.h>
 
 namespace {
     Connection establishConnectionToTracker() {
-        Connection conn(TRACKER_PUBLIC_IP, TRACKER_BIND_PORT);
+        Connection conn(ConnectionManager::getInstance().getTrackerIP(), ConnectionManager::getInstance().getTrackerPort());
         return conn;
     }
 
