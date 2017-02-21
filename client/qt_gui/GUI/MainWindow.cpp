@@ -141,11 +141,17 @@ void MainWindow::getAvailableFilesButtonClicked() {
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-    FileInfo fileInfo = availableFiles[row];
-    std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
-    cm.addFileHandler(newFileHandler);
-    connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler*)), this, SLOT(updateFileDownloadProgress(FileHandler*)));
-    newFileHandler->beginDownload();
+    if (isFileLocalAndDownloaded(availableFiles[row]) != "100") {
+        FileInfo fileInfo = availableFiles[row];
+        std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
+        cm.addFileHandler(newFileHandler);
+        connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
+                SLOT(updateFileDownloadProgress(FileHandler * )));
+        newFileHandler->beginDownload();
+    }
+    else {
+        LOG(INFO) << "File already downloaded";
+    }
 }
 
 void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
