@@ -10,7 +10,9 @@ class TrackerProtocolTranslator {
         TrackerProtocolTranslator();
         /**
          * Generates a response to a message received from a client
+         * @param header Header read from socket
          * @param message Message read from socket
+         * @param conn Reference to a Connection instance corresponding to the sender
          * @return String response to be sent to client
          */
         std::string generateResponse(char header, std::string message, Connection &conn);
