@@ -48,7 +48,6 @@ class Chunk {
          * disk.
          * @return Data contained within the chunk
          */
-        // TODO Implement caching mechanism (lazy initialization, remove from cache if not used recently / RAM overused
         std::vector<char> &getData();
 
         /**
@@ -89,7 +88,7 @@ class Chunk {
         /**
          * Pointer to file associated with the chunk.
          */
-        File *associatedFile; // TODO Replace with Observer pattern
+        File *associatedFile;
 
         /**
          * Vector containing actual chunk data. It acts as a buffer, if the data

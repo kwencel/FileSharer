@@ -29,6 +29,9 @@ class FileInfo {
             ar & availableChunks;
         }
 
+        /**
+         * @return String for printing availableChunks vector
+         */
         std::string printChunks();
 
         /**
@@ -58,27 +61,23 @@ class FileInfo {
          */
          std::vector<bool> getAvailableChunks() const;
 
+        /**
+         * @return Number of peers that have this file
+         */
+        unsigned long getNumberOfPeers() const;
+
+        /**
+         * Sets number of peers
+         * @param numberOfPeers
+         */
+        void setNumberOfPeers(unsigned long numberOfPeers);
+
     private:
         std::string filename;
         std::string hash;
         unsigned long size;
         unsigned long numberOfPeers;
-    public:
-        unsigned long getNumberOfPeers() const;
-
-    public:
-        void setNumberOfPeers(unsigned long numberOfPeers);
-
-    private:
         std::vector<bool> availableChunks;
-};
-
-
-struct FileInfoHasher {
-    size_t operator() (const FileInfo &fileInfo) const {
-        std::string temp = fileInfo.getName() + fileInfo.getHash();
-        return (temp.length());
-    }
 };
 
 #endif //FILESHARER_FILEINFO_H

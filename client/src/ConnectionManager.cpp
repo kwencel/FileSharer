@@ -1,5 +1,4 @@
 #include <dnet.h>
-// TODO replace dnet.h with sth more commonly installed
 #include <iostream>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
@@ -96,7 +95,6 @@ ConnectionManager::~ConnectionManager() {
 
 std::unordered_set<std::shared_ptr<Connection>> ConnectionManager::getActiveConnections() {
     connectionsMutex.lock();
-    // TODO Ping every client to make sure connection is active - remove inactive connections from set
     std::unordered_set<std::shared_ptr<Connection>> connections = this->connections;
     connectionsMutex.unlock();
     return connections;

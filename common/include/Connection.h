@@ -8,7 +8,6 @@
 #include <Define.h>
 #include <forward_list>
 #include "../../client/include/Observer.h"
-//TODO change CMakeLists to include this with just the header name
 
 class ConnectionManager;
 
@@ -60,10 +59,21 @@ class Connection {
          */
         std::string read(size_t howMany = RECEIVE_BUFFER, time_t timeout = DEFAULT_TIMEOUT);
 
+        /**
+         * Notifies observers by calling update on them
+         */
         void notify();
 
+        /**
+         * Registers an observer
+         * @param observer Observer to be registered
+         */
         void registerObserver(Observer *observer);
 
+        /**
+         * Unregister an observer
+         * @param observer Observer to be unregistered
+         */
         void unregisterObserver(Observer *observer);
 
     private:
@@ -77,6 +87,9 @@ class Connection {
          */
         int peerSocketDescriptor;
 
+        /**
+         * List of observers of an instance of this class
+         */
         std::forward_list<class Observer *> observers;
 };
 

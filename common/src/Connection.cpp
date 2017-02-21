@@ -68,7 +68,7 @@ std::string Connection::read(size_t howMany, time_t timeout) {
             readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
         }
         if (retries == READ_RETRIES) {
-            throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort()); //TODO test read timeout
+            throw ReadTimeoutError(this->getPeerIP(), this->getPeerPort());
         }
         if (readBytes == -1) {
             perror("Error during read in Connection");

@@ -4,7 +4,6 @@
 #include <memory>
 
 
-// TODO Template class
 class Observer {
     public:
         virtual void update(class Connection *) = 0;
