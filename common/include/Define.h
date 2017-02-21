@@ -3,13 +3,14 @@
 
 //CLIENT
 
-#define CHUNK_SIZE_KB       128
-#define MD5_BUFFER_SIZE     1024
-#define RECEIVE_BUFFER      1024
-#define CHUNK_SIZE          (1024 * CHUNK_SIZE_KB)
-#define FILES_PATH_PREFIX   "files/"
-#define READ_RETRIES        3
-#define DEFAULT_TIMEOUT     500
+#define CHUNK_SIZE_KB               128
+#define MD5_BUFFER_SIZE             1024
+#define RECEIVE_BUFFER              1024
+#define CHUNK_SIZE                  (1024 * CHUNK_SIZE_KB)
+#define FILES_PATH_PREFIX           "files/"
+#define READ_RETRIES                3
+#define DEFAULT_TIMEOUT             500
+#define MEMORY_PER_FILE_LIMIT       5
 
 //PROTOCOL
 

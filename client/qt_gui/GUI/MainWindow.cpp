@@ -149,7 +149,6 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
 }
 
 void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
-    LOG(INFO) << "Beginning progress update";
     float progress = 0;
     std::string hash = fileHandler->file->getHash();
 

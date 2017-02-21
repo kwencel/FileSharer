@@ -152,6 +152,7 @@ const std::vector<Chunk *> File::getChunks() const {
 }
 
 std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
+    checkMemoryLimit();
     fileStream.clear(fileStream.eofbit);
     fileStream.seekg(from);
     std::vector<char> buffer(howMany);
@@ -164,6 +165,7 @@ std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
 }
 
 bool File::writeBytes(unsigned long from, unsigned long howMany, std::vector<char> buffer) {
+    checkMemoryLimit();
     fileStream.clear(fileStream.eofbit);
     fileStream.seekg(from);
     fileStream.write(buffer.data(), howMany);
@@ -244,4 +246,19 @@ bool File::isDownloaded() const {
 
 unsigned long File::getDownloadedChunksAmount() const {
     return downloadedChunksAmount;
+}
+
+void File::checkMemoryLimit() {
+    unsigned long cachedChunks = 0;
+    for (auto &&chunk : chunks) {
+        if (chunk->isCached()) {
+            ++cachedChunks;
+        }
+    }
+    if (((cachedChunks * CHUNK_SIZE_KB) / 1024) > MEMORY_PER_FILE_LIMIT) {
+        for (auto &&chunk : chunks) {
+            chunk->clearCache();
+        }
+        LOG(INFO) << "Cached data of file " << name << " cleared";
+    }
 }

@@ -39,8 +39,6 @@ void Chunk::setData(std::vector<char> data) {
     this->data = data;
     this->downloaded = true;
     associatedFile->notifyChunkDownloaded(id);
-    data.clear();
-    data.shrink_to_fit();
 }
 
 unsigned long Chunk::getId() const {
@@ -71,5 +69,14 @@ std::string Chunk::calculateHashMD5(std::vector<char>& buffer) {
         ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c[i];
     }
     return ss.str();
+}
+
+bool Chunk::isCached() const {
+    return !data.empty();
+}
+
+void Chunk::clearCache() {
+    data.clear();
+    data.shrink_to_fit();
 }
 

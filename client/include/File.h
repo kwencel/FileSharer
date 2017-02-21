@@ -172,6 +172,8 @@ class File {
          * Verifies the partially downloaded file condition and restores the vector of Chunk based on the .meta file.
          */
         void verify();
+
+        void checkMemoryLimit();
 };
 
 

@@ -66,6 +66,10 @@ class Chunk {
          */
         bool isDownloaded() const;
 
+        bool isCached() const;
+
+        void clearCache();
+
 
 
     private:
@@ -102,6 +106,9 @@ class Chunk {
          * Indicates if the chunk contains the valid data.
          */
         bool downloaded = false;
+
+
+    private:
 
         /**
          * Calculates the MD5 hash of the data provided in a @a buffer
