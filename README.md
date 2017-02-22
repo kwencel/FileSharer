@@ -5,6 +5,7 @@ A P2P file sharing program.
     CMake 3.6 (it will probably compile using older versions too, see the last paragraph)
     Boost 1.63.0 (filesystem and serialization)
     OpenSSL 1.0.2 (used for calculating md5 hashes)
+    QT 5.8 (for GUI)
 
 # Build instructions (for both tracker and client)
 ```
