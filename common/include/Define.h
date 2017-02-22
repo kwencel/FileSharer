@@ -9,8 +9,8 @@
 #define CHUNK_SIZE                  (1024 * CHUNK_SIZE_KB)
 #define FILES_PATH_PREFIX           "files/"
 #define READ_RETRIES                3
-#define DEFAULT_TIMEOUT             500
-#define MEMORY_PER_FILE_LIMIT       5
+#define DEFAULT_TIMEOUT             20
+#define MEMORY_PER_FILE_LIMIT_MB    5
 
 //PROTOCOL
 

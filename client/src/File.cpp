@@ -255,7 +255,7 @@ void File::checkMemoryLimit() {
             ++cachedChunks;
         }
     }
-    if (((cachedChunks * CHUNK_SIZE_KB) / 1024) > MEMORY_PER_FILE_LIMIT) {
+    if (((cachedChunks * CHUNK_SIZE_KB) / 1024) > MEMORY_PER_FILE_LIMIT_MB) {
         for (auto &&chunk : chunks) {
             chunk->clearCache();
         }
