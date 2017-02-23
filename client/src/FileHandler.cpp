@@ -23,15 +23,34 @@ FileHandler::FileHandler(FileInfo fileInfo) {
         file = std::make_unique<File>(fileInfo.getName());
     } else {
         // File does not exists on disk even partially. Download expected chunks hashes from any peer having the file
-        PeerFile peer = peersWithFile[0];
-        std::shared_ptr<Connection> peerConnection = establishConnection(peer.getIp(), peer.getPort(), true);
-        peerConnection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
-        std::string response = peerConnection.get()->read(9);
-        ProtocolUtils::decodeHeader(response.substr(0, 1));
-        uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
-        response = peerConnection.get()->read(size);
+        std::shared_ptr<Connection> peerConnection;
+        int peerNumber = 0;
+        PeerFile peer;
+        std::vector<std::string> hashes;
 
-        std::vector<std::string> hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);
+        // Usually -1 means an error - in this case it means we've successfully obtained chunks hashes from one of the peers
+        while (peerNumber != -1) {
+            peer = peersWithFile[peerNumber];
+            try {
+                peerConnection = establishConnection(peer.getIp(), peer.getPort(), true);
+                peerConnection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
+                std::string response = peerConnection.get()->read(9);
+                ProtocolUtils::decodeHeader(response.substr(0, 1));
+                uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
+                response = peerConnection.get()->read(size);
+                hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);
+                peerNumber = -1;
+            } catch (const std::exception &e) {
+                LOG(WARNING) << "Communication with peer " << peer.getIp() << ":" << peer.getPort()
+                             << " failed. Trying the next peer";
+                if (peerNumber == peersWithFile.size() - 1) {
+                    LOG(ERROR) << "This peer was the last one having the file. Communication with all peers failed. Cannot download teh file.";
+                    throw std::runtime_error("Unable to connect to any peer having the file");
+                } else {
+                    ++peerNumber;
+                }
+            }
+        }
 
         // Finally call the File constructor
         file = std::make_unique<File>(fileInfo, hashes);
