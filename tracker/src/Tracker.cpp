@@ -37,13 +37,14 @@ int main(int argc, char *argv[]) {
         perror("Error during socket creation");
     }
 
+    int enable = 1;
+    setsockopt(serverSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+
     CHK_EX(bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize));
     CHK_EX(listen(serverSocketDescriptor, 5));
 
     while (1) {
         int clientSocketDescriptor = accept(serverSocketDescriptor, (struct sockaddr *) &serverSocket, &socketSize);
-        int enable = 1;
-        setsockopt(clientSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
         Connection conn = Connection(clientSocketDescriptor, serverSocket);
         LOG(INFO) << "Connected peer: " << conn.getPeerIP() << ":" << conn.getPeerPort();
         std::string headerAndSize = conn.read(9);

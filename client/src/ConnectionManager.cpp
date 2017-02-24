@@ -162,3 +162,27 @@ const std::string ConnectionManager::getTrackerIP() const {
 uint16_t ConnectionManager::getTrackerPort() const {
     return trackerPort;
 }
+
+void ConnectionManager::addToDownloadingFiles(std::shared_ptr<FileHandler> fileHandler) {
+    this->currentlyDownloadingFiles.push_back(fileHandler);
+}
+
+void ConnectionManager::removeFromDownloadingFiles(FileHandler* fileHandler) {
+    for (auto it = this->currentlyDownloadingFiles.begin(); it != this->currentlyDownloadingFiles.end(); ++it) {
+        if ((*it)->file->getHash() == fileHandler->file->getHash()) {
+            currentlyDownloadingFiles.erase(it);
+            break;
+        }
+    }
+}
+
+bool ConnectionManager::isFileBeingDownloaded(FileInfo fileInfo) {
+    for (auto sptrFileHandler : this->currentlyDownloadingFiles) {
+        if (sptrFileHandler->file->getHash() == fileInfo.getHash()) {
+            LOG(INFO) << "File is being downlaoded already";
+            return true;
+        }
+    }
+    LOG(INFO) << "File is not being downloaded already";
+    return false;
+}

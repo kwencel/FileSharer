@@ -41,6 +41,10 @@ class ConnectionManager {
         const std::string getTrackerIP() const;
         uint16_t getTrackerPort() const;
 
+        void addToDownloadingFiles(std::shared_ptr<FileHandler> fileHandler);
+        void removeFromDownloadingFiles(FileHandler* fileHandler);
+        bool isFileBeingDownloaded(FileInfo fileInfo);
+
     private:
         ConnectionManager(std::string bindIP, uint16_t bindPort);
         virtual ~ConnectionManager();
@@ -51,6 +55,8 @@ class ConnectionManager {
         std::mutex connectionsMutex;
         std::vector<std::shared_ptr<FileHandler>> fileHandlers;
         std::mutex fileHandlersMutex;
+        std::vector<std::shared_ptr<FileHandler>> currentlyDownloadingFiles;
+
 
     private:
         uint16_t trackerPort;

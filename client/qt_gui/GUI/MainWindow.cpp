@@ -141,10 +141,11 @@ void MainWindow::getAvailableFilesButtonClicked() {
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-    if (isFileLocalAndDownloaded(availableFiles[row]) != "100") {
+    if (isFileLocalAndDownloaded(availableFiles[row]) != "100" && !cm.isFileBeingDownloaded(availableFiles[row])) {
         FileInfo fileInfo = availableFiles[row];
         std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
         cm.addFileHandler(newFileHandler);
+        cm.addToDownloadingFiles(newFileHandler);
         connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
                 SLOT(updateFileDownloadProgress(FileHandler * )));
         newFileHandler->beginDownload();
@@ -174,6 +175,7 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
             if (stringProgress == "100") {
                 QFont newFont = ui->availableFilesTableWidget->item(i,3)->font();
                 newFont.setBold(false);
+                this->cm.removeFromDownloadingFiles(fileHandler);
                 for (unsigned int j = 0; j < (unsigned int) ui->availableFilesTableWidget->columnCount(); ++j) {
                     ui->availableFilesTableWidget->item(i, j)->setFont(newFont);
                 }
