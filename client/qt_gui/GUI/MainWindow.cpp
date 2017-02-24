@@ -22,7 +22,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     cm.setFileHandlers(this->scanLocalFiles());
     insertLocalFiles();
-    cm.listenLoop();
+    try {
+        cm.listenLoop();
+    } catch (std::runtime_error e) {
+        std::string s(e.what());
+        s = "Critical error! " + s;
+        QMessageBox::warning(
+                this,
+                tr("Error"),
+                QString::fromStdString(s));
+    }
     cm.processIncomingConnections();
     this->informTrackerButtonClicked();
     this->getAvailableFilesButtonClicked();
@@ -36,7 +45,7 @@ MainWindow::~MainWindow()
 std::vector<std::shared_ptr<FileHandler>> MainWindow::scanLocalFiles() {
     namespace fs = boost::filesystem;
     fs::path fullPath(fs::current_path());
-    fullPath /= "files";
+    fullPath /= FILES_PATH_PREFIX;
     fs::directory_iterator end_iter;
 
     std::vector<std::shared_ptr<FileHandler>> fileHandlers;
@@ -141,10 +150,11 @@ void MainWindow::getAvailableFilesButtonClicked() {
 }
 
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
-    if (isFileLocalAndDownloaded(availableFiles[row]) != "100") {
+    if (isFileLocalAndDownloaded(availableFiles[row]) != "100" && !cm.isFileBeingDownloaded(availableFiles[row])) {
         FileInfo fileInfo = availableFiles[row];
         std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
         cm.addFileHandler(newFileHandler);
+        cm.addToDownloadingFiles(newFileHandler);
         connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
                 SLOT(updateFileDownloadProgress(FileHandler * )));
         try {
@@ -178,6 +188,7 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
             if (stringProgress == "100") {
                 QFont newFont = ui->availableFilesTableWidget->item(i,3)->font();
                 newFont.setBold(false);
+                this->cm.removeFromDownloadingFiles(fileHandler);
                 for (unsigned int j = 0; j < (unsigned int) ui->availableFilesTableWidget->columnCount(); ++j) {
                     ui->availableFilesTableWidget->item(i, j)->setFont(newFont);
                 }

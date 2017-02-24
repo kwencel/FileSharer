@@ -94,6 +94,10 @@ class ConnectionManager {
          */
         uint16_t getTrackerPort() const;
 
+        void addToDownloadingFiles(std::shared_ptr<FileHandler> fileHandler);
+        void removeFromDownloadingFiles(FileHandler* fileHandler);
+        bool isFileBeingDownloaded(FileInfo fileInfo);
+
     private:
         /**
          * Private constructor to ensure there is only one instance of
@@ -112,6 +116,8 @@ class ConnectionManager {
         int ownSocketDescriptor;
         std::vector<std::shared_ptr<FileHandler>> fileHandlers;
         std::mutex fileHandlersMutex;
+        std::vector<std::shared_ptr<FileHandler>> currentlyDownloadingFiles;
+
 
     private:
         /**

@@ -4,14 +4,67 @@
 #include "Connection.h"
 #include <unistd.h>
 #include <CustomExceptions.h>
+#include <fcntl.h>
 
 Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocket.sin_family = AF_INET;
     peerSocket.sin_port = htons(peerPort);
     peerSocket.sin_addr.s_addr = inet_addr(peerIP.c_str());
     peerSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-    CHK_CUSTOM(connect(peerSocketDescriptor, (sockaddr *)&peerSocket, sizeof(peerSocket)),
-               (throw ConnectionError(std::string("Outgoing connection creation: ") + strerror(errno))));
+    long flags;
+    if ( (flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
+        fprintf(stderr, "Error on fcntl F_GETFL (%s)\n", strerror(errno));
+    }
+    flags |= O_NONBLOCK;
+
+    if ( fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
+        fprintf(stderr, "Error on fcntl F_SETFL (%s)\n", strerror(errno));
+    }
+
+    int result = connect(peerSocketDescriptor, (sockaddr *)&peerSocket, sizeof(peerSocket));
+    if (result < 0) {
+        if (errno == EINPROGRESS) {
+            fprintf(stderr, "EINPROGRESS in connect() - selecting\n");
+            timeval tv;
+            fd_set set;
+            do {
+                tv.tv_sec = 5;
+                tv.tv_usec = 0;
+                FD_ZERO(&set);
+                FD_SET(peerSocketDescriptor, &set);
+                result = select(peerSocketDescriptor + 1, NULL, &set, NULL, &tv);
+                if (result < 0 && errno != EINTR) {
+                    throw ConnectionError("Error on connect: " + std::string(strerror(errno)));
+                } else if (result > 0) {
+                    socklen_t len = sizeof(int);
+                    int valopt;
+                    if (getsockopt(peerSocketDescriptor, SOL_SOCKET, SO_ERROR, (void *) (&valopt), &len) < 0) {
+                        throw ConnectionError("Error on connect: " + std::string(strerror(errno)));
+                    }
+                    if (valopt) {
+                        throw ConnectionError("Outgoing connection creation failed!");
+                    }
+                    break;
+                }
+                else {
+                    throw ConnectionError("Timeout in select()");
+                }
+            } while(1);
+        }
+        else {
+            throw ConnectionError(strerror(errno));
+        }
+    }
+    if( (flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
+        fprintf(stderr, "Error fcntl(..., F_GETFL) (%s)\n", strerror(errno));
+        exit(0);
+    }
+    flags  &= (~O_NONBLOCK);
+    if( fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
+        fprintf(stderr, "Error fcntl(..., F_SETFL) (%s)\n", strerror(errno));
+        exit(0);
+    }
+
 }
 
 Connection::Connection(int peerSocketDescriptor, sockaddr_in peerSocket) {
