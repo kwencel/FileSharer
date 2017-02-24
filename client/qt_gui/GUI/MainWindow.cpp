@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     insertLocalFiles();
     try {
         cm.listenLoop();
-    } catch (std::runtime_error e) {
+    } catch (std::runtime_error &e) {
         std::string s(e.what());
         s = "Critical error! " + s;
         QMessageBox::warning(
@@ -97,7 +97,7 @@ void MainWindow::informTrackerButtonClicked() {
     try {
         std::vector<FileInfo> localFileInfoVector = this->getLocalFileInfos();
         std::string response = TrackerHandler::registerToTracker(cm.getOwnIP(), cm.getOwnPort(), localFileInfoVector);
-    } catch (ConnectionError e) {
+    } catch (ConnectionError &e) {
         std::string s(e.what());
         s = "Cannot register to tracker. " + s;
         QMessageBox::warning(
@@ -139,7 +139,7 @@ void MainWindow::getAvailableFilesButtonClicked() {
             ui->availableFilesTableWidget->setItem(row, 3, progress);
             ++row;
         }
-    } catch (ConnectionError e) {
+    } catch (ConnectionError &e) {
         std::string s(e.what());
         s = "Cannot check tracker for available files. " + s;
         QMessageBox::warning(
