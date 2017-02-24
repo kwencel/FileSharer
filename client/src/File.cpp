@@ -85,6 +85,9 @@ void File::createChunks() {
     // (size / CHUNK_SIZE) division rounded up
     unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
     unsigned remainder = (unsigned) (size % CHUNK_SIZE);
+    if (remainder == 0) {
+        remainder = CHUNK_SIZE;
+    }
     chunks.reserve(chunksAmount);
     unsigned long id;
     for (id = 0; id < chunksAmount - 1; ++id) {
@@ -96,6 +99,9 @@ void File::createChunks() {
 void File::createChunks(std::vector<std::string> &chunksHashes) {
     unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
     unsigned remainder = (unsigned) (size % CHUNK_SIZE);
+    if (remainder == 0) {
+        remainder = CHUNK_SIZE;
+    }
     chunks.reserve(chunksAmount);
     unsigned long id;
     for (id = 0; id < chunksAmount - 1; ++id) {

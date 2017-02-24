@@ -17,6 +17,7 @@ class File;
 
 class FileHandler :  public QObject, public Observer {
         Q_OBJECT
+
     public:
         /**
          * Constructs the FileHandler from information gathered from tracker
@@ -34,6 +35,11 @@ class FileHandler :  public QObject, public Observer {
          * Allows Connection to notify FileTracker about incoming data (Observer/Listener pattern applied)
          */
         virtual void update(Connection*) override;
+
+        /**
+         * Removed observed connection from internal list and unsubscribes from its notifications
+         */
+        virtual void stopObserving(Connection*) override;
 
         /**
          * Starts the download process

@@ -62,7 +62,15 @@ std::string Connection::read(size_t howMany, time_t timeout) {
             toRead = howMany;
         }
         readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
-        while (readBytes == 0 && retries < READ_RETRIES) {
+        if (readBytes == 0) {
+            // Socket descriptor was closed on the other end - EOF
+            LOG(INFO) << "Closing connection to " << getPeerIPandPort();
+            while (not observers.empty()) {
+                (*(observers.begin()))->stopObserving(this);
+            }
+            return data;
+        }
+        while (errno == EAGAIN && retries < READ_RETRIES) {
             ++retries;
             LOG(WARNING) << "Read() timeout - retry attempt " + std::to_string(retries);
             readBytes = recv(peerSocketDescriptor, buffer, toRead, 0);
@@ -84,7 +92,8 @@ std::string Connection::read(size_t howMany, time_t timeout) {
 }
 
 void Connection::notify() {
-    for (auto &&observer : observers) {
+    std::forward_list<Observer*> tmpObservers(observers);
+    for (auto &&observer : tmpObservers) {
         observer->update(this);
     }
 }

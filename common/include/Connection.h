@@ -43,6 +43,9 @@ class Connection {
          */
         uint16_t getPeerPort();
 
+        /**
+         * @return Returns Peer's IP and port in pretty format IP:Port
+         */
         std::string getPeerIPandPort();
 
         /**

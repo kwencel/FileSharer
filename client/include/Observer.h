@@ -5,6 +5,7 @@
 class Observer {
     public:
         virtual void update(class Connection *) = 0;
+        virtual void stopObserving(class Connection *) = 0;
 };
 
 

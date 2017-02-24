@@ -24,12 +24,13 @@ FileHandler::FileHandler(FileInfo fileInfo) {
     } else {
         // File does not exists on disk even partially. Download expected chunks hashes from any peer having the file
         std::shared_ptr<Connection> peerConnection;
-        int peerNumber = 0;
+        unsigned peerNumber = 0;
         PeerFile peer;
         std::vector<std::string> hashes;
+        bool success = false;
 
         // Usually -1 means an error - in this case it means we've successfully obtained chunks hashes from one of the peers
-        while (peerNumber != -1) {
+        while (!success) {
             peer = peersWithFile[peerNumber];
             try {
                 peerConnection = establishConnection(peer.getIp(), peer.getPort(), true);
@@ -39,7 +40,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
                 uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
                 response = peerConnection.get()->read(size);
                 hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);
-                peerNumber = -1;
+                success = true;
             } catch (const std::exception &e) {
                 LOG(WARNING) << "Communication with peer " << peer.getIp() << ":" << peer.getPort()
                              << " failed. Trying the next peer";
@@ -81,7 +82,7 @@ void FileHandler::update(Connection* connection) {
         }
         case PROTOCOL_PEER_CONNECTION_CLOSE: {
             LOG(INFO) << "Received connection close";
-            connections.erase(connection->getPeerIP() + ":" + std::to_string(connection->getPeerPort()));
+            connections.erase(connection->getPeerIPandPort());
             ConnectionManager::getInstance().removeConnection(connection);
             break;
         }
@@ -113,8 +114,13 @@ std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP,
 }
 
 void FileHandler::addConnection(std::shared_ptr<Connection> connection) {
-    connections.insert({connection.get()->getPeerIP() + ":" + std::to_string(connection.get()->getPeerPort()), connection});
+    connections.insert({connection.get()->getPeerIPandPort(), connection});
     connection.get()->registerObserver(this);
+}
+
+void FileHandler::stopObserving(Connection *connection) {
+    connections.erase(connection->getPeerIPandPort());
+    connection->unregisterObserver(this);
 }
 
 bool FileHandler::initializeCommunication(std::shared_ptr<Connection> connection) {

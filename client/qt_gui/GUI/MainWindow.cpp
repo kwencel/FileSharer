@@ -147,7 +147,11 @@ void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
         cm.addFileHandler(newFileHandler);
         connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
                 SLOT(updateFileDownloadProgress(FileHandler * )));
-        newFileHandler->beginDownload();
+        try {
+            newFileHandler->beginDownload();
+        } catch (std::exception &e) {
+            LOG(ERROR) << "Could not download file. Reason: " << e.what();
+        }
     }
     else {
         LOG(INFO) << "File already downloaded";
