@@ -186,6 +186,7 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
         if (rowHash == hash) {
             ui->availableFilesTableWidget->item(i, 3)->setText(qStringProgress);
             if (stringProgress == "100") {
+                this->informTrackerButtonClicked();
                 QFont newFont = ui->availableFilesTableWidget->item(i,3)->font();
                 newFont.setBold(false);
                 this->cm.removeFromDownloadingFiles(fileHandler);
