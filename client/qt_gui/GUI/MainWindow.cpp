@@ -45,7 +45,7 @@ MainWindow::~MainWindow()
 std::vector<std::shared_ptr<FileHandler>> MainWindow::scanLocalFiles() {
     namespace fs = boost::filesystem;
     fs::path fullPath(fs::current_path());
-    fullPath /= "files";
+    fullPath /= FILES_PATH_PREFIX;
     fs::directory_iterator end_iter;
 
     std::vector<std::shared_ptr<FileHandler>> fileHandlers;
