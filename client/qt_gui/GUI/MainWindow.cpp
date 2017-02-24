@@ -22,7 +22,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     cm.setFileHandlers(this->scanLocalFiles());
     insertLocalFiles();
-    cm.listenLoop();
+    try {
+        cm.listenLoop();
+    } catch (std::runtime_error e) {
+        std::string s(e.what());
+        s = "Critical error! " + s;
+        QMessageBox::warning(
+                this,
+                tr("Error"),
+                QString::fromStdString(s));
+    }
     cm.processIncomingConnections();
     this->informTrackerButtonClicked();
     this->getAvailableFilesButtonClicked();

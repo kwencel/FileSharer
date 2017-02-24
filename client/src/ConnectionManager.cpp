@@ -60,15 +60,15 @@ bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection>
 }
 
 void ConnectionManager::listenLoop() {
-    CHK_MSG(listen(ownSocketDescriptor, 5), "ConnectionManager listen");
+    if (listen(ownSocketDescriptor, 5) == -1) {
+        throw std::runtime_error("Client listen error: " + std::string(strerror(errno)));
+    }
     std::thread([&]() {
         int peerSocketDescriptor;
-        int enable = 1;
         sockaddr_in peerSocket {0};
         socklen_t sizeOfPeerSocket = sizeof(peerSocket);
         while (true) {
             peerSocketDescriptor = accept(ownSocketDescriptor, (sockaddr *) &peerSocket, &sizeOfPeerSocket);
-            setsockopt(peerSocketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
             std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerSocketDescriptor, peerSocket);
             LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
             if (!notifyFileAboutNewConnection(conn)) {
