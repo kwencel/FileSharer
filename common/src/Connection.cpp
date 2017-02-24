@@ -13,18 +13,18 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
     peerSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     long flags;
     if ( (flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
-        LOG(ERROR) << "Error on fcntl F_GETFL " + std::string(strerror(errno));
+        LOG(ERROR) << "Establishing new Connection: Error on fcntl F_GETFL " + std::string(strerror(errno));
     }
     flags |= O_NONBLOCK;
 
     if ( fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
-        LOG(ERROR) << "Error on fcntl F_SETFL " + std::string(strerror(errno));
+        LOG(ERROR) << "Establishing new Connection: Error on fcntl F_SETFL " + std::string(strerror(errno));
     }
 
     int result = connect(peerSocketDescriptor, (sockaddr *)&peerSocket, sizeof(peerSocket));
     if (result < 0) {
         if (errno == EINPROGRESS) {
-            LOG(INFO) << "EINPROGRESS in connect() - selecting";
+            LOG(INFO) << "Establishing new Connection: EINPROGRESS in connect() - selecting";
             timeval tv;
             fd_set set;
             do {
@@ -55,13 +55,13 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
             throw ConnectionError(strerror(errno));
         }
     }
-    if( (flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
-        LOG(ERROR) << "Error on fcntl F_GETFL " + std::string(strerror(errno));
+    if ((flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
+        LOG(ERROR) << "Establishing new Connection: Error on fcntl F_GETFL " + std::string(strerror(errno));
         exit(0);
     }
     flags  &= (~O_NONBLOCK);
-    if( fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
-        LOG(ERROR) << "Error on fcntl F_SETFL " + std::string(strerror(errno));
+    if (fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
+        LOG(ERROR) << "Establishing new Connection: Error on fcntl F_SETFL " + std::string(strerror(errno));
         exit(0);
     }
 

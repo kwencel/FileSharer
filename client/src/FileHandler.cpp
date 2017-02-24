@@ -29,7 +29,6 @@ FileHandler::FileHandler(FileInfo fileInfo) {
         std::vector<std::string> hashes;
         bool success = false;
 
-        // Usually -1 means an error - in this case it means we've successfully obtained chunks hashes from one of the peers
         while (!success) {
             peer = peersWithFile[peerNumber];
             try {
@@ -45,7 +44,7 @@ FileHandler::FileHandler(FileInfo fileInfo) {
                 LOG(WARNING) << "Communication with peer " << peer.getIp() << ":" << peer.getPort()
                              << " failed. Trying the next peer";
                 if (peerNumber == peersWithFile.size() - 1) {
-                    LOG(ERROR) << "This peer was the last one having the file. Communication with all peers failed. Cannot download teh file.";
+                    LOG(ERROR) << "This peer was the last one having the file. Communication with all peers failed. Cannot download the file.";
                     throw std::runtime_error("Unable to connect to any peer having the file");
                 } else {
                     ++peerNumber;

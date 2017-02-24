@@ -152,12 +152,12 @@ void MainWindow::getAvailableFilesButtonClicked() {
 void MainWindow::trackerFileRowDoubleClicked(int row, int column) {
     if (isFileLocalAndDownloaded(availableFiles[row]) != "100" && !cm.isFileBeingDownloaded(availableFiles[row])) {
         FileInfo fileInfo = availableFiles[row];
-        std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
-        cm.addFileHandler(newFileHandler);
-        cm.addToDownloadingFiles(newFileHandler);
-        connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
-                SLOT(updateFileDownloadProgress(FileHandler * )));
         try {
+            std::shared_ptr<FileHandler> newFileHandler = std::make_shared<FileHandler>(fileInfo);
+            cm.addFileHandler(newFileHandler);
+            cm.addToDownloadingFiles(newFileHandler);
+            connect(newFileHandler.get(), SIGNAL(updateFileHandlerProgress(FileHandler * )), this,
+                    SLOT(updateFileDownloadProgress(FileHandler * )));
             newFileHandler->beginDownload();
         } catch (std::exception &e) {
             LOG(ERROR) << "Could not download file. Reason: " << e.what();
