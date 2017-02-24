@@ -24,7 +24,7 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
     int result = connect(peerSocketDescriptor, (sockaddr *)&peerSocket, sizeof(peerSocket));
     if (result < 0) {
         if (errno == EINPROGRESS) {
-            LOG(ERROR) << "EINPROGRESS in connect() - selecting";
+            LOG(DEBUG) << "EINPROGRESS in connect() - selecting";
             timeval tv;
             fd_set set;
             do {
