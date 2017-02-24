@@ -42,12 +42,6 @@ class ConnectionManager {
         int getOwnSocketDescriptor();
 
         /**
-         * Removes the given connection from the set
-         * @param connection Connection to be removed
-         */
-        void removeConnection(Connection *connection);
-
-        /**
          * Adds new connections to @a connections set.
          */
         void listenLoop();
@@ -56,11 +50,6 @@ class ConnectionManager {
          * Notifies subscribed FileHandlers when new data is available on the Connection
          */
         void processIncomingConnections();
-
-        /**
-         * @return Unordered set of monitored connections
-         */
-        std::unordered_set<std::shared_ptr<Connection>> getActiveConnections();
 
         /**
          * Creates and returns new connection. Adds it to the epoll waiting queue
@@ -121,8 +110,6 @@ class ConnectionManager {
 
         sockaddr_in ownSocket;
         int ownSocketDescriptor;
-        std::unordered_set<std::shared_ptr<Connection>> connections;
-        std::mutex connectionsMutex;
         std::vector<std::shared_ptr<FileHandler>> fileHandlers;
         std::mutex fileHandlersMutex;
 

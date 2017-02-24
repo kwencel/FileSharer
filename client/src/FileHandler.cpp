@@ -81,9 +81,7 @@ void FileHandler::update(Connection* connection) {
             break;
         }
         case PROTOCOL_PEER_CONNECTION_CLOSE: {
-            LOG(INFO) << "Received connection close";
-            connections.erase(connection->getPeerIPandPort());
-            ConnectionManager::getInstance().removeConnection(connection);
+            LOG(INFO) << "Received connection close.";
             break;
         }
         default:
@@ -119,8 +117,8 @@ void FileHandler::addConnection(std::shared_ptr<Connection> connection) {
 }
 
 void FileHandler::stopObserving(Connection *connection) {
-    connections.erase(connection->getPeerIPandPort());
     connection->unregisterObserver(this);
+    connections.erase(connection->getPeerIPandPort());
 }
 
 bool FileHandler::initializeCommunication(std::shared_ptr<Connection> connection) {

@@ -72,13 +72,8 @@ void ConnectionManager::listenLoop() {
             std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerSocketDescriptor, peerSocket);
             LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
             if (!notifyFileAboutNewConnection(conn)) {
-                // Appropriate file now found
-                LOG(DEBUG) << "Connecion would be closed";
-                continue;
+                LOG(DEBUG) << "FileHandler associated with connection " << conn.get()->getPeerIPandPort() << " not found";
             }
-            connectionsMutex.lock();
-            connections.insert(conn);
-            connectionsMutex.unlock();
         }
     }).detach();
 }
@@ -87,19 +82,9 @@ ConnectionManager::~ConnectionManager() {
     close(epollDescriptor);
 }
 
-std::unordered_set<std::shared_ptr<Connection>> ConnectionManager::getActiveConnections() {
-    connectionsMutex.lock();
-    std::unordered_set<std::shared_ptr<Connection>> connections = this->connections;
-    connectionsMutex.unlock();
-    return connections;
-}
-
 std::shared_ptr<Connection> ConnectionManager::requestConnection(std::string peerIP, uint16_t peerPort) {
     std::shared_ptr<Connection> connection = std::make_shared<Connection>(peerIP, peerPort);
     LOG(INFO) << "Created new connection to " << connection.get()->getPeerIP() << ":" << connection.get()->getPeerPort();
-    connectionsMutex.lock();
-    connections.insert(connection);
-    connectionsMutex.unlock();
     epoll_event epollEvent;
     epollEvent.data.ptr = connection.get();
     epollEvent.events = EPOLLIN;
@@ -121,17 +106,6 @@ void ConnectionManager::processIncomingConnections() {
             }
         }
     }).detach();
-}
-
-void ConnectionManager::removeConnection(Connection *connection) {
-    connectionsMutex.lock();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        if ((*it).get() == connection) {
-            connections.erase(it);
-            break;
-        }
-    }
-    connectionsMutex.unlock();
 }
 
 void ConnectionManager::addFileHandler(std::shared_ptr<FileHandler> newFileHandler) {

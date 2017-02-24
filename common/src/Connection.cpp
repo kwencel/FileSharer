@@ -67,6 +67,7 @@ std::string Connection::read(size_t howMany, time_t timeout) {
             LOG(INFO) << "Closing connection to " << getPeerIPandPort();
             while (not observers.empty()) {
                 (*(observers.begin()))->stopObserving(this);
+                close(peerSocketDescriptor);
             }
             return data;
         }
