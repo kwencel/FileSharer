@@ -7,7 +7,7 @@ A P2P file sharing program.
     OpenSSL 1.0.2 (used for calculating md5 hashes)
     QT 5.8 (for GUI)
 
-# Build instructions (for both tracker and client)
+# Build instructions
 ```
 git clone --recursive https://github.com/kwencel/FileSharer
 cd FileSharer
@@ -16,7 +16,7 @@ make
 ```
 
 # Configuration
-**Pass command line parameteres to client and tracker to configure them**
+**Pass command line parameters to client and tracker to configure them**
 
 **Client**
 ```
@@ -34,8 +34,7 @@ TRACKER_BIND_PORT Port tracker binds to
 Usage: ./tracker <TRACKER_BIND_IP> <TRACKER_BIND_PORT>
 ```
 
-# How to use?
-
+# How to use
 On startup client tries to communicate with tracker to register local files and request signatures
 of files available from all registered peers. LocalFiles table lists all local files and displays
 their names, hashes and sizes. TrackerFiles table lists all files from registered peers and displays
