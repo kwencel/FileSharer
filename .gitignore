@@ -1,3 +1,11 @@
+# IDE
 .idea/*
 !.idea/codeStyleSettings.xml
+cmake-build-debug/
+
+# Qt
+*.pro.user
+*.pro.user.*
+
+# Distribution specific
 .directory
