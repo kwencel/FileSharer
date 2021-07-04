@@ -17,7 +17,7 @@ class PeerManager {
          * Adds a Peer instance to the list of peers that tracker knows about
          * @param peer Instance of Peer to be added to tracker's peer list
          */
-        bool addPeer(Peer peer);
+        bool addPeer(const Peer& peer);
 
         /**
          * Constructs a vector that contains a PeerFile instance for every peer that has a file identified by hash
@@ -25,7 +25,7 @@ class PeerManager {
          * @return Vector of type PeerFile that contains ip, port and a vector of available chunks for every peer
          * that has the file in question
          */
-        std::vector<PeerFile> getPeersWithFile(std::string hash);
+        std::vector<PeerFile> getPeersWithFile(const std::string& hash);
 
         /**
          * Finds all distinct files (by hash) among all peers
@@ -39,7 +39,7 @@ class PeerManager {
          * @param port Port of newly registered peer
          * @return Pointer to a corresponding Peer instance if it was found. Else boost::none
          */
-        boost::optional<Peer*> isPeerAdded(std::string ip, uint16_t port);
+        boost::optional<Peer*> isPeerAdded(const std::string& ip, uint16_t port);
         std::vector<Peer> peerList;
 };
 

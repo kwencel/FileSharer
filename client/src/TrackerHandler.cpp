@@ -4,6 +4,8 @@
 #include <ClientProtocolTranslator.h>
 #include <ConnectionManager.h>
 
+#include <utility>
+
 namespace {
     Connection establishConnectionToTracker() {
         Connection conn(ConnectionManager::getInstance().getTrackerIP(), ConnectionManager::getInstance().getTrackerPort());
@@ -20,7 +22,7 @@ namespace {
 
 std::string TrackerHandler::registerToTracker(std::string ownIp, uint16_t ownPort, std::vector<FileInfo> fileInfoVector) {
     Connection conn = establishConnectionToTracker();
-    Peer localPeer(ownIp, ownPort, fileInfoVector);
+    Peer localPeer(std::move(ownIp), ownPort, std::move(fileInfoVector));
 
     char header = PROTOCOL_HEADER_REGISTER;
     std::string message = ClientProtocolTranslator::generateMessage<Peer>(header, localPeer);
@@ -39,7 +41,7 @@ std::vector<FileInfo> TrackerHandler::getAvailableFiles() {
     return ClientProtocolTranslator::decodeMessage<std::vector<FileInfo>>(responseDataString);
 }
 
-std::vector<PeerFile> TrackerHandler::getPeersWithFileByHash(std::string hash) {
+std::vector<PeerFile> TrackerHandler::getPeersWithFileByHash(const std::string &hash) {
     Connection conn = establishConnectionToTracker();
 
     char header = PROTOCOL_HEADER_PEERS_WITH_FILE;

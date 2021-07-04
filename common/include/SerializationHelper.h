@@ -19,7 +19,7 @@ namespace SerializationHelper {
      * @return String that represents serialized data (header-size-object)
      */
     template<typename T>
-    static std::string serialize(char header, T object) {
+    static std::string serialize(char header, const T &object) {
         std::string headerAsString = ProtocolUtils::encodeHeader(header);
         std::ostringstream archive_stream;
         {
@@ -41,7 +41,7 @@ namespace SerializationHelper {
      * @return Returns an instance of class T obtained from deserialization
      */
     template<typename T>
-    static T deserialize(std::string &serializedObject) {
+    static T deserialize(const std::string &serializedObject) {
         T deserializedObject;
         std::stringstream archive_stream;
         archive_stream << serializedObject;

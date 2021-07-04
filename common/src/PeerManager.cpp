@@ -5,7 +5,7 @@ PeerManager::PeerManager() {
 
 }
 
-bool PeerManager::addPeer(Peer peer) {
+bool PeerManager::addPeer(const Peer &peer) {
     boost::optional<Peer*> searchedForPeer = isPeerAdded(peer.getIp(), peer.getPort());
     if (searchedForPeer) {
         (*searchedForPeer)->setFileList(peer.getFileList());
@@ -17,14 +17,14 @@ bool PeerManager::addPeer(Peer peer) {
     }
 }
 
-boost::optional<Peer*> PeerManager::isPeerAdded(std::string ip, uint16_t port) {
+boost::optional<Peer*> PeerManager::isPeerAdded(const std::string &ip, uint16_t port) {
     for (Peer &p : peerList) {
-        if (p.getIp() == ip && p.getPort() == port) return boost::optional<Peer*>(&p);
+        if (p.getIp() == ip && p.getPort() == port) return { &p };
     }
     return boost::none;
 }
 
-std::vector<PeerFile> PeerManager::getPeersWithFile(std::string hash) {
+std::vector<PeerFile> PeerManager::getPeersWithFile(const std::string &hash) {
     std::vector<PeerFile> peerChunkAvailability;
     for (Peer &p : peerList) {
         boost::optional<std::vector<bool>> availableChunks;

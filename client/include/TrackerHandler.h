@@ -25,7 +25,7 @@ namespace TrackerHandler {
      * @param hash Hash of file in question
      * @return Vector of PeerFile for all peers that have the file in question
      */
-    std::vector<PeerFile> getPeersWithFileByHash(std::string hash);
+    std::vector<PeerFile> getPeersWithFileByHash(const std::string &hash);
 }
 
 

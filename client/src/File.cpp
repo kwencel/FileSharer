@@ -37,7 +37,7 @@ File::File(const std::string &name) {
     }
 }
 
-File::File(FileInfo fileInfo, std::vector<std::string> chunksHashes) {
+File::File(const FileInfo& fileInfo, std::vector<std::string> chunksHashes) {
     this->name = fileInfo.getName();
     this->relativePath = FILES_PATH_PREFIX + name;
     this->size = fileInfo.getSize();
@@ -76,15 +76,15 @@ void File::createMeta(std::vector<std::string> &chunksHashes) {
     meta.open(relativePath + ".meta", std::ios::out | std::ios::trunc);
     meta << hash << std::endl;
     meta << size << std::endl;
-    for (unsigned long i = 0; i < chunksHashes.size(); ++i) {
-        meta << chunksHashes[i] << std::endl;
+    for (auto &chunkHash : chunksHashes) {
+        meta << chunkHash << std::endl;
     }
 }
 
 void File::createChunks() {
     // (size / CHUNK_SIZE) division rounded up
     unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
-    unsigned remainder = (unsigned) (size % CHUNK_SIZE);
+    auto remainder = (unsigned) (size % CHUNK_SIZE);
     if (remainder == 0) {
         remainder = CHUNK_SIZE;
     }
@@ -98,7 +98,7 @@ void File::createChunks() {
 
 void File::createChunks(std::vector<std::string> &chunksHashes) {
     unsigned long chunksAmount = 1 + ((size - 1) / CHUNK_SIZE);
-    unsigned remainder = (unsigned) (size % CHUNK_SIZE);
+    auto remainder = (unsigned) (size % CHUNK_SIZE);
     if (remainder == 0) {
         remainder = CHUNK_SIZE;
     }
@@ -153,13 +153,13 @@ unsigned long File::getChunksAmount() const {
     return chunks.size();
 }
 
-const std::vector<Chunk *> File::getChunks() const {
+std::vector<Chunk *> File::getChunks() const {
     return chunks;
 }
 
 std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
     checkMemoryLimit();
-    fileStream.clear(fileStream.eofbit);
+    fileStream.clear(std::fstream::eofbit);
     fileStream.seekg(from);
     std::vector<char> buffer(howMany);
     fileStream.read(buffer.data(), howMany);
@@ -172,7 +172,7 @@ std::vector<char> File::readBytes(unsigned long from, unsigned long howMany) {
 
 bool File::writeBytes(unsigned long from, unsigned long howMany, std::vector<char> buffer) {
     checkMemoryLimit();
-    fileStream.clear(fileStream.eofbit);
+    fileStream.clear(std::fstream::eofbit);
     fileStream.seekg(from);
     fileStream.write(buffer.data(), howMany);
     return fileStream.good();
@@ -197,7 +197,7 @@ unsigned long File::getSize() const {
 std::string File::calculateHashMD5(unsigned long from, unsigned long howMany) {
     MD5_CTX mdContext;
     MD5_Init(&mdContext);
-    unsigned char c[MD5_DIGEST_LENGTH];
+    unsigned char digest[MD5_DIGEST_LENGTH];
 
     std::vector<char> buffer;
     unsigned long endPos = from + howMany;
@@ -206,12 +206,12 @@ std::string File::calculateHashMD5(unsigned long from, unsigned long howMany) {
         buffer = readBytes(from, MD5_BUFFER_SIZE);
         from += buffer.size();
         MD5_Update(&mdContext, buffer.data(), buffer.size());
-    } while (from < endPos || buffer.size() > 0);
-    MD5_Final(c, &mdContext);
+    } while (from < endPos || !buffer.empty());
+    MD5_Final(digest, &mdContext);
 
     std::stringstream ss;
-    for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
-        ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c[i];
+    for (unsigned char c : digest) {
+        ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c;
     }
     return ss.str();
 }

@@ -39,7 +39,7 @@ class Peer {
          * @return Boost::optional wrapper of a vector of bool values denoting which chunks of the requested file this peer has.
          * If the file has not been found, returns boost::none.
          */
-        boost::optional<std::vector<bool>> checkForFile(std::string hash);
+        boost::optional<std::vector<bool>> checkForFile(const std::string& hash);
 
         /**
          * @return IP number of peer

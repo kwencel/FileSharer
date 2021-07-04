@@ -1,9 +1,11 @@
 #include "PeerFile.h"
 
+#include <utility>
+
 PeerFile::PeerFile(std::string ip, uint16_t port, std::vector<bool> availableChunks) {
-    this->ip = ip;
+    this->ip = std::move(ip);
     this ->port = port;
-    this->availableChunks = availableChunks;
+    this->availableChunks = std::move(availableChunks);
 }
 
 PeerFile::PeerFile() {

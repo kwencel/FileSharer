@@ -3,7 +3,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "TrackerProtocolTranslator.h"
-#include <boost/serialization/vector.hpp>
 #include <ProtocolUtils.h>
 #include <ErrorCheckUtils.h>
 
@@ -18,7 +17,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string trackerBindIP = argv[1];
-    uint16_t trackerBindPort = static_cast<uint16_t>(atoi(argv[2]));
+    auto trackerBindPort = static_cast<uint16_t>(atoi(argv[2]));
 
     TrackerProtocolTranslator protocolTranslator;
 
@@ -43,7 +42,7 @@ int main(int argc, char *argv[]) {
     CHK_EX(bind(serverSocketDescriptor, (struct sockaddr *) &serverSocket, socketSize));
     CHK_EX(listen(serverSocketDescriptor, 5));
 
-    while (1) {
+    while (true) {
         int clientSocketDescriptor = accept(serverSocketDescriptor, (struct sockaddr *) &serverSocket, &socketSize);
         Connection conn = Connection(clientSocketDescriptor, serverSocket);
         LOG(INFO) << "Connected peer: " << conn.getPeerIP() << ":" << conn.getPeerPort();

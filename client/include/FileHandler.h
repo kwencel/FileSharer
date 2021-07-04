@@ -23,23 +23,23 @@ class FileHandler :  public QObject, public Observer {
          * Constructs the FileHandler from information gathered from tracker
          * @param fileInfo Basic information about the file
          */
-        FileHandler(FileInfo fileInfo);
+        explicit FileHandler(const FileInfo &fileInfo);
 
         /**
          * Constructs the FileHandler based on information read from disk
          * @param name Name of the file
          */
-        FileHandler(std::string name);
+        explicit FileHandler(const std::string &name);
 
         /**
          * Allows Connection to notify FileTracker about incoming data (Observer/Listener pattern applied)
          */
-        virtual void update(Connection*) override;
+        void update(Connection*) override;
 
         /**
          * Removed observed connection from internal list and unsubscribes from its notifications
          */
-        virtual void stopObserving(Connection*) override;
+        void stopObserving(Connection*) override;
 
         /**
          * Starts the download process
@@ -54,25 +54,25 @@ class FileHandler :  public QObject, public Observer {
          * @param dontRegister IP of the peer you want to connect to
          * @return Shared pointer to the newly established connection
          */
-        std::shared_ptr<Connection> establishConnection(std::string peerIP, uint16_t peerPort, bool dontRegister = false);
+        std::shared_ptr<Connection> establishConnection(const std::string &peerIP, uint16_t peerPort, bool dontRegister = false);
 
         /**
          * Adds connection to the internal list and subscribes to its notifications
          * @param connection Connection
          */
-        void addConnection(std::shared_ptr<Connection> connection);
+        void addConnection(const std::shared_ptr<Connection> &connection);
 
         /**
          * Adds connection to the internal list and subscribes to its notifications
          */
-        bool initializeCommunication(std::shared_ptr<Connection> connection);
+        bool initializeCommunication(const std::shared_ptr<Connection>& connection);
 
         /**
          * Sends chunks hashes to the given Peer
          * @param peerIP IP of the peer you want to send the information to
          * @param peerPort Port of the peer you want to send the information to
          */
-        void sendChunksHashes(std::string peerIP, uint16_t peerPort);
+        void sendChunksHashes(const std::string &peerIP, uint16_t peerPort);
 
         /**
          * Sends a chunk's data request to the given Peer
@@ -80,7 +80,7 @@ class FileHandler :  public QObject, public Observer {
          * @param peerPort Port of the peer you want to send the information to
          * @param chunkId ID of the chunk the request concern
          */
-        void requestChunk(std::string peerIP, uint16_t peerPort, uint64_t chunkId);
+        void requestChunk(const std::string &peerIP, uint16_t peerPort, uint64_t chunkId);
 
         /**
          * Sends a chunk's data to the given Peer
@@ -88,7 +88,7 @@ class FileHandler :  public QObject, public Observer {
          * @param peerPort Port of the peer you want to send the information to
          * @param chunkId ID of the chunk the request concern
          */
-        void sendChunk(std::string peerIP, uint16_t peerPort, uint64_t chunkId);
+        void sendChunk(const std::string &peerIP, uint16_t peerPort, uint64_t chunkId);
 
         /**
          * Unique pointer to the File associated with the FileHandler
@@ -96,7 +96,7 @@ class FileHandler :  public QObject, public Observer {
         std::unique_ptr<File> file;
 
     signals:
-        void updateFileHandlerProgress(FileHandler* fileHandler);
+        void updateFileHandlerProgress(FileHandler *fileHandler);
 
     private:
         /**
@@ -111,7 +111,7 @@ class FileHandler :  public QObject, public Observer {
          * @param connection
          * @return ID of the chunk which data was received
          */
-        uint64_t receiveChunk(Connection *connection);
+        uint64_t receiveChunk(Connection *connection) const;
 
         /**
          * Updates the download progress information in the GUI

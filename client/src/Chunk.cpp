@@ -5,7 +5,7 @@
 Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile) :
         id(id), realSize(realSize), associatedFile(associatedFile), downloaded(true) { };
 
-Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash) :
+Chunk::Chunk(unsigned long id, unsigned realSize, File *associatedFile, const std::string &hash) :
         id(id), realSize(realSize), hash(hash), associatedFile(associatedFile) {
     std::vector<char> tmpData;
     tmpData = associatedFile->readChunkData(this);
@@ -21,14 +21,14 @@ unsigned Chunk::getRealSize() const {
 std::vector<char> &Chunk::getData() {
     if (data.empty()) {
         if (not downloaded) {
-            std::runtime_error("Chunk " + std::to_string(id) + "is not on disk");
+            throw std::runtime_error("Chunk " + std::to_string(id) + "is not on disk");
         }
         data = associatedFile->readChunkData(id);
     }
     return data;
 }
 
-void Chunk::setData(std::vector<char> data) {
+void Chunk::setData(const std::vector<char> &data) {
     if (data.size() != realSize) {
         throw ChunkSizeMismatchError(realSize, data.size());
     }
@@ -45,7 +45,7 @@ unsigned long Chunk::getId() const {
     return id;
 }
 
-const std::string Chunk::getHash() {
+std::string Chunk::getHash() {
     if (hash.empty()) {
         hash = calculateHashMD5(getData());
     }
@@ -56,7 +56,7 @@ bool Chunk::isDownloaded() const {
     return downloaded;
 }
 
-std::string Chunk::calculateHashMD5(std::vector<char>& buffer) {
+std::string Chunk::calculateHashMD5(const std::vector<char> &buffer) {
     MD5_CTX mdContext;
     MD5_Init(&mdContext);
     unsigned char c[MD5_DIGEST_LENGTH];
@@ -65,8 +65,8 @@ std::string Chunk::calculateHashMD5(std::vector<char>& buffer) {
     MD5_Final(c, &mdContext);
 
     std::stringstream ss;
-    for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
-        ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) c[i];
+    for (unsigned char i : c) {
+        ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned short) i;
     }
     return ss.str();
 }

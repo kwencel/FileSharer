@@ -29,7 +29,7 @@ class File {
          * @param size Size of the file
          * @param chunksHashes Vector of target chunk hashes
          */
-        File(FileInfo fileInfo, std::vector<std::string> chunksHashes);
+        File(const FileInfo &fileInfo, std::vector<std::string> chunksHashes);
 
         /**
          * Deletes all Chunks from memory and closes the fileStream
@@ -44,7 +44,7 @@ class File {
         /**
          * @return Vector of chunks the file was divided to.
          */
-        const std::vector<Chunk *> getChunks() const;
+        std::vector<Chunk *> getChunks() const;
 
         /**
          * @return Name of the file.

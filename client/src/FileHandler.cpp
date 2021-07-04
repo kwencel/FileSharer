@@ -7,11 +7,11 @@
 #include <TrackerHandler.h>
 #include <boost/filesystem/operations.hpp>
 
-FileHandler::FileHandler(std::string name) {
+FileHandler::FileHandler(const std::string &name) {
     file = std::make_unique<File>(name);
 }
 
-FileHandler::FileHandler(FileInfo fileInfo) {
+FileHandler::FileHandler(const FileInfo &fileInfo) {
     this->fileInfo = fileInfo;
     std::string hash = fileInfo.getHash();
 
@@ -33,11 +33,11 @@ FileHandler::FileHandler(FileInfo fileInfo) {
             peer = peersWithFile[peerNumber];
             try {
                 peerConnection = establishConnection(peer.getIp(), peer.getPort(), true);
-                peerConnection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
-                std::string response = peerConnection.get()->read(9);
+                peerConnection->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_HASHES));
+                std::string response = peerConnection->read(9);
                 ProtocolUtils::decodeHeader(response.substr(0, 1));
                 uint64_t size = ProtocolUtils::decodeSize(response.substr(1, 8));
-                response = peerConnection.get()->read(size);
+                response = peerConnection->read(size);
                 hashes = ClientProtocolTranslator::decodeMessage<std::vector<std::string>>(response);
                 success = true;
             } catch (const std::exception &e) {
@@ -54,22 +54,22 @@ FileHandler::FileHandler(FileInfo fileInfo) {
 
         // Finally call the File constructor
         file = std::make_unique<File>(fileInfo, hashes);
-        peerConnection.get()->registerObserver(this);
+        peerConnection->registerObserver(this);
     }
 }
 
-void FileHandler::update(Connection* connection) {
+void FileHandler::update(Connection *connection) {
     LOG(INFO) << "Message from " << connection->getPeerIPandPort();
     char header = connection->read(1)[0];
     switch (header) {
         case PROTOCOL_PEER_REQUEST_CHUNK: {
             uint64_t chunkId = ProtocolUtils::decodeSize(connection->read(8));
-            LOG(INFO) << connection->getPeerIPandPort() << " requested a chunk " << chunkId << " of file " << file.get()->name;
+            LOG(INFO) << connection->getPeerIPandPort() << " requested a chunk " << chunkId << " of file " << file->name;
             sendChunk(connection->getPeerIP(), connection->getPeerPort(), chunkId);
             break;
         }
         case PROTOCOL_PEER_REQUEST_HASHES: {
-            LOG(INFO) << "Peer requested a vector of chunks hashes of file " << file.get()->name;
+            LOG(INFO) << "Peer requested a vector of chunks hashes of file " << file->name;
             sendChunksHashes(connection->getPeerIP(), connection->getPeerPort());
             break;
         }
@@ -89,7 +89,7 @@ void FileHandler::update(Connection* connection) {
     }
 }
 
-std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP, uint16_t peerPort, bool dontRegister) {
+std::shared_ptr<Connection> FileHandler::establishConnection(const std::string &peerIP, uint16_t peerPort, bool dontRegister) {
     std::shared_ptr<Connection> conn;
     // Find if there is already a connection with this peer
     auto possibleConnection = connections.find(peerIP + ":" + std::to_string(peerPort));
@@ -101,7 +101,7 @@ std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP,
         if (initializeCommunication(conn)) {
             connections.insert({peerIP + ":" + std::to_string(peerPort), conn});
             if (!dontRegister) {
-                conn.get()->registerObserver(this);
+                conn->registerObserver(this);
             }
         } else {
             LOG(ERROR) << "Peer " << peerIP << ":" << peerPort << " did not send ACK on communication initialization!";
@@ -110,9 +110,9 @@ std::shared_ptr<Connection> FileHandler::establishConnection(std::string peerIP,
     return conn;
 }
 
-void FileHandler::addConnection(std::shared_ptr<Connection> connection) {
-    connections.insert({connection.get()->getPeerIPandPort(), connection});
-    connection.get()->registerObserver(this);
+void FileHandler::addConnection(const std::shared_ptr<Connection> &connection) {
+    connections.insert({connection->getPeerIPandPort(), connection});
+    connection->registerObserver(this);
 }
 
 void FileHandler::stopObserving(Connection *connection) {
@@ -120,36 +120,36 @@ void FileHandler::stopObserving(Connection *connection) {
     connections.erase(connection->getPeerIPandPort());
 }
 
-bool FileHandler::initializeCommunication(std::shared_ptr<Connection> connection) {
-    connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_HASH) + fileInfo.getHash());
-    std::string response = connection.get()->read(1);
+bool FileHandler::initializeCommunication(const std::shared_ptr<Connection> &connection) {
+    connection->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_HASH) + fileInfo.getHash());
+    std::string response = connection->read(1);
     return ProtocolUtils::decodeHeader(response) == PROTOCOL_PEER_INIT_ACK;
 }
 
-void FileHandler::sendChunksHashes(std::string peerIP, uint16_t peerPort) {
+void FileHandler::sendChunksHashes(const std::string &peerIP, uint16_t peerPort) {
     std::string header = ProtocolUtils::encodeHeader(PROTOCOL_PEER_SEND_HASHES);
     std::string message = ClientProtocolTranslator::generateMessage<std::vector<std::string>>(header[0], file->getChunksHashes());
-    establishConnection(peerIP, peerPort).get()->write(message);
+    establishConnection(peerIP, peerPort)->write(message);
 }
 
-void FileHandler::requestChunk(std::string peerIP, uint16_t peerPort, uint64_t chunkId) {
-    establishConnection(peerIP, peerPort).get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_CHUNK) +
+void FileHandler::requestChunk(const std::string &peerIP, uint16_t peerPort, uint64_t chunkId) {
+    establishConnection(peerIP, peerPort)->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_REQUEST_CHUNK) +
                                                        ProtocolUtils::encodeSize(chunkId));
 }
 
-void FileHandler::sendChunk(std::string peerIP, uint16_t peerPort, uint64_t chunkId) {
+void FileHandler::sendChunk(const std::string &peerIP, uint16_t peerPort, uint64_t chunkId) {
     std::string header = ProtocolUtils::encodeHeader(PROTOCOL_PEER_SEND_CHUNK);
     Chunk* chunk = file->getChunks()[chunkId];
     std::string message = ClientProtocolTranslator::generateMessage<std::vector<char>>(header[0], chunk->getData());
-    establishConnection(peerIP, peerPort).get()->write(message + ProtocolUtils::encodeSize(chunkId));
+    establishConnection(peerIP, peerPort)->write(message + ProtocolUtils::encodeSize(chunkId));
 }
 
-uint64_t FileHandler::receiveChunk(Connection *connection) {
+uint64_t FileHandler::receiveChunk(Connection *connection) const {
     uint64_t serializedVectorSize = ProtocolUtils::decodeSize(connection->read(8));
     std::string response = connection->read(serializedVectorSize);
     std::vector<char> chunkData = ClientProtocolTranslator::decodeMessage<std::vector<char>>(response);
     uint64_t chunkId = ProtocolUtils::decodeSize(connection->read(8));
-    file.get()->chunks[chunkId]->setData(chunkData);
+    file->chunks[chunkId]->setData(chunkData);
     return chunkId;
 }
 
@@ -165,7 +165,7 @@ void FileHandler::beginDownload() {
                     loads.push_back(peerLoads[peerIndex]);
                 }
             }
-            if (loads.size() != 0) {
+            if (!loads.empty()) {
                 long lowestLoadPosition = std::distance(loads.begin(), std::min_element(loads.begin(), loads.end()));
                 long lowestLoadPeerIndex = indexes[lowestLoadPosition];
                 requestChunk(peersWithFile[lowestLoadPeerIndex].getIp(), peersWithFile[lowestLoadPeerIndex].getPort(),

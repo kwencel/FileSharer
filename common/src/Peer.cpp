@@ -1,9 +1,11 @@
 #include "Peer.h"
 
+#include <utility>
+
 Peer::Peer(std::string ip, uint16_t port, std::vector<FileInfo> fileList) {
-    this->ip = ip;
+    this->ip = std::move(ip);
     this->port = port;
-    this->fileList = fileList;
+    this->fileList = std::move(fileList);
 }
 
 Peer::Peer() {
@@ -14,7 +16,7 @@ Peer::~Peer() {
 
 }
 
-boost::optional<std::vector<bool>> Peer::checkForFile(std::string hash) {
+boost::optional<std::vector<bool>> Peer::checkForFile(const std::string &hash) {
     for (FileInfo &fi : fileList) {
         if (fi.compareHash(hash)) {
             return fi.getAvailableChunks();
@@ -36,6 +38,6 @@ std::vector<FileInfo> Peer::getFileList() const {
 }
 
 void Peer::setFileList(std::vector<FileInfo> fileList) {
-    this->fileList = fileList;
+    this->fileList = std::move(fileList);
 }
 

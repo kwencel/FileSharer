@@ -8,10 +8,10 @@ std::string ProtocolUtils::encodeSize(uint64_t number) {
     return std::string((char*) &number, 8);
 }
 
-char ProtocolUtils::decodeHeader(std::string encodedNumber) {
+char ProtocolUtils::decodeHeader(const std::string &encodedNumber) {
     return (*(char *)(encodedNumber.c_str()));
 }
 
-uint64_t ProtocolUtils::decodeSize(std::string encodedNumber) {
+uint64_t ProtocolUtils::decodeSize(const std::string &encodedNumber) {
     return (*(uint64_t *)(encodedNumber.c_str()));
 }

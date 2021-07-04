@@ -15,7 +15,7 @@ class TrackerProtocolTranslator {
          * @param conn Reference to a Connection instance corresponding to the sender
          * @return String response to be sent to client
          */
-        std::string generateResponse(char header, std::string message, Connection &conn);
+        std::string generateResponse(char header, const std::string& message, Connection &conn);
 
     private:
         PeerManager peerManager;

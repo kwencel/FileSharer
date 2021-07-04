@@ -6,13 +6,13 @@
 #include <CustomExceptions.h>
 #include <fcntl.h>
 
-Connection::Connection(std::string peerIP, uint16_t peerPort) {
+Connection::Connection(const std::string &peerIP, uint16_t peerPort) {
     peerSocket.sin_family = AF_INET;
     peerSocket.sin_port = htons(peerPort);
     peerSocket.sin_addr.s_addr = inet_addr(peerIP.c_str());
     peerSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     long flags;
-    if ( (flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
+    if ((flags = fcntl(peerSocketDescriptor, F_GETFL, NULL)) < 0) {
         LOG(ERROR) << "Establishing new Connection: Error on fcntl F_GETFL " + std::string(strerror(errno));
     }
     flags |= O_NONBLOCK;
@@ -32,7 +32,7 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
                 tv.tv_usec = 0;
                 FD_ZERO(&set);
                 FD_SET(peerSocketDescriptor, &set);
-                result = select(peerSocketDescriptor + 1, NULL, &set, NULL, &tv);
+                result = select(peerSocketDescriptor + 1, nullptr, &set, nullptr, &tv);
                 if (result < 0 && errno != EINTR) {
                     throw ConnectionError("Error on connect: " + std::string(strerror(errno)));
                 } else if (result > 0) {
@@ -49,7 +49,7 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
                 else {
                     throw ConnectionError("Timeout in select()");
                 }
-            } while(1);
+            } while(true);
         }
         else {
             throw ConnectionError(strerror(errno));
@@ -59,7 +59,7 @@ Connection::Connection(std::string peerIP, uint16_t peerPort) {
         LOG(ERROR) << "Establishing new Connection: Error on fcntl F_GETFL " + std::string(strerror(errno));
         exit(0);
     }
-    flags  &= (~O_NONBLOCK);
+    flags &= (~O_NONBLOCK);
     if (fcntl(peerSocketDescriptor, F_SETFL, flags) < 0) {
         LOG(ERROR) << "Establishing new Connection: Error on fcntl F_SETFL " + std::string(strerror(errno));
         exit(0);
@@ -78,7 +78,7 @@ std::string Connection::getPeerIP() {
     return std::string(ip);
 }
 
-uint16_t Connection::getPeerPort() {
+uint16_t Connection::getPeerPort() const {
     return ntohs(peerSocket.sin_port);
 }
 
@@ -92,7 +92,7 @@ Connection::~Connection() {
     close(peerSocketDescriptor);
 }
 
-ssize_t Connection::write(std::string data) {
+ssize_t Connection::write(const std::string& data) const {
     return send(peerSocketDescriptor, data.c_str(), data.length(), 0);
 }
 

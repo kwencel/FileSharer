@@ -23,13 +23,13 @@ class Chunk {
          * @param associatedFile File that chunk concerns
          * @param hash MD5 hash of the chunk
          */
-        Chunk(unsigned long id, unsigned realSize, File *associatedFile, std::string hash);
+        Chunk(unsigned long id, unsigned realSize, File *associatedFile, const std::string &hash);
 
         /**
          * Returns the chunk's MD5 hash. If its not cached in @a hash field it will be calculated by accessing the disk.
          * @return Hash of the chunk
          */
-        const std::string getHash();
+        std::string getHash();
 
         /**
          * Returns the real chunk size (last chunk will probably have a @a realSize that is smaller than the chunk size.
@@ -58,7 +58,7 @@ class Chunk {
          * @throw ChunkSizeMismatchError If @a data has a different size from the expected one in the @a realSize field
          * @throw ChunkHashMismatchError If @a data has a different hash from the expected one in the @a hash field
          */
-        void setData(std::vector<char> data);
+        void setData(const std::vector<char> &data);
 
         /**
          * @return True if the chunk's data was downloaded
@@ -116,7 +116,7 @@ class Chunk {
          * @param buffer A buffer storing the data to be calculated hash for
          * @return MD5 hash calculated for the data provided in the @a buffer
          */
-        std::string calculateHashMD5(std::vector<char> &buffer);
+        static std::string calculateHashMD5(const std::vector<char> &buffer);
 };
 
 

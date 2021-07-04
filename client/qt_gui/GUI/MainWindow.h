@@ -16,8 +16,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
     private slots:
         /**
@@ -40,14 +40,14 @@ public:
          * Slot function for updating progress of file download in GUI
          * @param fileHandler Pointer to FileHandler requesting GUI update
          */
-        void updateFileDownloadProgress(FileHandler* fileHandler);
+        void updateFileDownloadProgress(FileHandler *fileHandler);
 
 private:
         /**
          * Scans the files folder for files and creates FileHandlers for them
          * @return Vector of FileHandler for each found file
          */
-        std::vector<std::shared_ptr<FileHandler>> scanLocalFiles();
+        static std::vector<std::shared_ptr<FileHandler>> scanLocalFiles();
         /**
          * Inserts local files into LocalFiles QTableWidget
          */
@@ -57,7 +57,7 @@ private:
          * @param fileInfo FileInfo for a particular file
          * @return String representing file completeness ("0" to "100")
          */
-        std::string isFileLocalAndDownloaded(FileInfo fileInfo);
+        std::string isFileLocalAndDownloaded(const FileInfo& fileInfo);
         /**
          * Creates a vector of FileInfo for local files
          * @return Vector of FileInfo for local files

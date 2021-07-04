@@ -1,11 +1,13 @@
 #include "FileInfo.h"
 
-FileInfo::FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers) {
-    this->filename = filename;
-    this->hash = hash;
+#include <utility>
+
+FileInfo::FileInfo(std::string filename, std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers) {
+    this->filename = std::move(filename);
+    this->hash = std::move(hash);
     this->size = size;
     this->numberOfPeers = numberOfPeers;
-    this->availableChunks = availableChunks;
+    this->availableChunks = std::move(availableChunks);
 }
 
 FileInfo::FileInfo() {
@@ -20,7 +22,7 @@ std::string FileInfo::printChunks() {
     return chunks;
 }
 
-bool FileInfo::compareHash(std::string hashToCompare) {
+bool FileInfo::compareHash(const std::string &hashToCompare) {
     return (this->hash == hashToCompare);
 }
 

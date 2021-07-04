@@ -7,7 +7,7 @@ TrackerProtocolTranslator::TrackerProtocolTranslator() {
 
 }
 
-std::string TrackerProtocolTranslator::generateResponse(char header, std::string message, Connection &conn) {
+std::string TrackerProtocolTranslator::generateResponse(char header, const std::string &message, Connection &conn) {
     if (header == PROTOCOL_HEADER_REGISTER) {
         Peer newPeer2 = SerializationHelper::deserialize<Peer>(message);
         Peer newPeer = Peer(conn.getPeerIP(), newPeer2.getPort(), newPeer2.getFileList());

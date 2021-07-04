@@ -15,10 +15,10 @@ int main(int argc, char *argv[]) {
     }
 
     std::string clientBindIP = argv[3];
-    uint16_t clientBindPort = static_cast<uint16_t>(atoi(argv[4]));
+    auto clientBindPort = static_cast<uint16_t>(atoi(argv[4]));
 
     std::string trackerIP = argv[1];
-    uint16_t trackerPort = static_cast<uint16_t>(atoi(argv[2]));
+    auto trackerPort = static_cast<uint16_t>(atoi(argv[2]));
 
     ConnectionManager::getInstance(clientBindIP, clientBindPort);
     ConnectionManager::getInstance().setTrackerDetails(trackerIP, trackerPort);
@@ -28,5 +28,5 @@ int main(int argc, char *argv[]) {
     w.show();
 
 
-    return a.exec();
+    return QApplication::exec();
 }

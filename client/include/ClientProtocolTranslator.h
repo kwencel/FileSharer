@@ -14,9 +14,9 @@ namespace ClientProtocolTranslator {
          * @return Generated message string
          */
         template<typename T>
-        std::string generateMessage(char header, T object) {
-                std::string message = SerializationHelper::serialize<T>(header, object);
-                return message;
+        std::string generateMessage(char header, const T &object) {
+            std::string message = SerializationHelper::serialize<T>(header, object);
+            return message;
         }
 
         /**
@@ -26,9 +26,9 @@ namespace ClientProtocolTranslator {
          * @return Object of type T obtained from message
          */
         template<typename T>
-        T decodeMessage(std::string message) {
-                T object = SerializationHelper::deserialize<T>(message);
-                return object;
+        T decodeMessage(const std::string &message) {
+            T object = SerializationHelper::deserialize<T>(message);
+            return object;
         }
 };
 

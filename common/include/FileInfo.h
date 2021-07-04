@@ -15,7 +15,7 @@ class FileInfo {
          * @param hash Hash of the file
          * @param availableChunks Vector of bool values denoting which chunks of the file are available
          */
-        FileInfo(const std::string filename, const std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers = 0);
+        FileInfo(std::string filename, std::string hash, unsigned long size, std::vector<bool> availableChunks, unsigned long numberOfPeers = 0);
         FileInfo();
 
         friend class boost::serialization::access;
@@ -39,7 +39,7 @@ class FileInfo {
          * @param hashToCompare Hash to compare against file hash
          * @return Boolean result of the comparison between file hash and argument hash
          */
-        bool compareHash(std::string hashToCompare);
+        bool compareHash(const std::string& hashToCompare);
 
         /**
          * @return Name of the file

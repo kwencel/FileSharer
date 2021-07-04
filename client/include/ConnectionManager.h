@@ -19,27 +19,30 @@ class ConnectionManager {
          * @param bindPort Placeholder value for making parameter optional
          * @return One and the only instance of ConnectionManager
          */
-        static ConnectionManager &getInstance(std::string bindIP  = "", uint16_t bindPort = 0);
+        static ConnectionManager &getInstance(const std::string& bindIP  = "", uint16_t bindPort = 0);
+
+        ConnectionManager() = delete;
+        ConnectionManager(const ConnectionManager &) = delete;
 
         /**
          * @return Socket tha ConnectionManager was bind to
          */
-        sockaddr_in getOwnSocket();
+        sockaddr_in getOwnSocket() const;
 
         /**
          * @return IP that was used to bind ConnectionManager
          */
-        std::string getOwnIP();
+        std::string getOwnIP() const;
 
         /**
          * @return IP thatwas used to bind ConnectionManager
          */
-        uint16_t getOwnPort();
+        uint16_t getOwnPort() const;
 
         /**
          * @return Descriptor of the socket ConnectionManager was bind to
          */
-        int getOwnSocketDescriptor();
+        int getOwnSocketDescriptor() const;
 
         /**
          * Adds new connections to @a connections set.
@@ -49,7 +52,7 @@ class ConnectionManager {
         /**
          * Notifies subscribed FileHandlers when new data is available on the Connection
          */
-        void processIncomingConnections();
+        void processIncomingConnections() const;
 
         /**
          * Creates and returns new connection. Adds it to the epoll waiting queue
@@ -57,14 +60,14 @@ class ConnectionManager {
          * @param peerPort Port of the peer you want to connect to
          * @return Shared pointer to the newly created Connection
          */
-        std::shared_ptr<Connection> requestConnection(std::string peerIP, uint16_t peerPort);
+        std::shared_ptr<Connection> requestConnection(const std::string &peerIP, uint16_t peerPort) const;
 
         /**
          * Adds new FileHandler to the monitoring vector. If new connection arrives this queue will be searched
          * to determine which FileHandler should respond to the request.
          * @param newFileHandler FileHandler to be added to the vector.
          */
-        void addFileHandler(std::shared_ptr<FileHandler> newFileHandler);
+        void addFileHandler(const std::shared_ptr<FileHandler> &newFileHandler);
 
         /**
          * Replaces the currently monitored FileHandlers vector with the new one.
@@ -75,7 +78,7 @@ class ConnectionManager {
         /**
          * @return Returns the currently monitored FileHandlers vector
          */
-        const std::vector<std::shared_ptr<FileHandler>>& getFileHandlers() const;
+        const std::vector<std::shared_ptr<FileHandler>> &getFileHandlers() const;
 
         /**
          * Sets tracker IP and Port for convenient access across the application
@@ -87,16 +90,16 @@ class ConnectionManager {
         /**
          * @return Tracker's public IP adress
          */
-        const std::string getTrackerIP() const;
+        std::string getTrackerIP() const;
 
         /**
          * @return Tracker's port
          */
         uint16_t getTrackerPort() const;
 
-        void addToDownloadingFiles(std::shared_ptr<FileHandler> fileHandler);
-        void removeFromDownloadingFiles(FileHandler* fileHandler);
-        bool isFileBeingDownloaded(FileInfo fileInfo);
+        void addToDownloadingFiles(const std::shared_ptr<FileHandler> &fileHandler);
+        void removeFromDownloadingFiles(FileHandler *fileHandler);
+        bool isFileBeingDownloaded(const FileInfo &fileInfo);
 
     private:
         /**
@@ -105,12 +108,20 @@ class ConnectionManager {
          * @param bindIP IP address that ConnectionManager will be bound to
          * @param bindPort Port that ConnectionManager will be bound to
          */
-        ConnectionManager(std::string bindIP, uint16_t bindPort);
+        ConnectionManager(const std::string &bindIP, uint16_t bindPort);
 
         /**
          * Destructs ConnectionManager and closes the epoll descriptor
          */
         virtual ~ConnectionManager();
+
+        /**
+         * Responds to the INIT protocol message and adds the connection to the epoll queue
+         * @param connection Connection that issued the INIT message
+         * @return True if the appropriate FileHandler was found and connection was successfully
+         * added to the epoll queue
+         */
+        bool notifyFileAboutNewConnection(const std::shared_ptr<Connection> &connection);
 
         sockaddr_in ownSocket;
         int ownSocketDescriptor;
@@ -118,22 +129,10 @@ class ConnectionManager {
         std::mutex fileHandlersMutex;
         std::vector<std::shared_ptr<FileHandler>> currentlyDownloadingFiles;
 
-
-    private:
-        /**
-         * Responds to the INIT protocol message and adds the connection to the epoll queue
-         * @param connection Connection that issued the INIT message
-         * @return True if the appropriate FileHandler was found and connection was successfully
-         * added to the epoll queue
-         */
-        bool notifyFileAboutNewConnection(std::shared_ptr<Connection> connection);
-
         uint16_t trackerPort;
         std::string trackerIP;
         int epollDescriptor;
 
-        ConnectionManager() = delete;
-        ConnectionManager(const ConnectionManager &) = delete;
 };
 
 

@@ -1,12 +1,12 @@
 #include <dnet.h>
-#include <iostream>
+#include <utility>
 #include <ErrorCheckUtils.h>
 #include <easylogging++.h>
 #include <ProtocolUtils.h>
 #include "include/ConnectionManager.h"
 
 
-ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
+ConnectionManager::ConnectionManager(const std::string &bindIP, uint16_t bindPort) {
     ownSocket.sin_family = AF_INET;
     ownSocket.sin_port = htons(bindPort);
     ownSocket.sin_addr.s_addr = inet_addr(bindIP.c_str());
@@ -16,42 +16,42 @@ ConnectionManager::ConnectionManager(std::string bindIP, uint16_t bindPort) {
     epollDescriptor = epoll_create(1);
 }
 
-ConnectionManager &ConnectionManager::getInstance(std::string bindIP, uint16_t bindPort) {
+ConnectionManager &ConnectionManager::getInstance(const std::string &bindIP, uint16_t bindPort) {
     static ConnectionManager instance(bindIP, bindPort);
     return instance;
 }
 
 
-std::string ConnectionManager::getOwnIP() {
+std::string ConnectionManager::getOwnIP() const {
     char ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(ownSocket.sin_addr), ip, INET_ADDRSTRLEN);
     return std::string(ip);
 }
 
-uint16_t ConnectionManager::getOwnPort() {
+uint16_t ConnectionManager::getOwnPort() const {
     return ntohs(ownSocket.sin_port);
 }
 
-sockaddr_in ConnectionManager::getOwnSocket() {
+sockaddr_in ConnectionManager::getOwnSocket() const {
     return ownSocket;
 }
 
-int ConnectionManager::getOwnSocketDescriptor() {
+int ConnectionManager::getOwnSocketDescriptor() const {
     return ownSocketDescriptor;
 }
 
-bool ConnectionManager::notifyFileAboutNewConnection(std::shared_ptr<Connection> connection) {
-    char header = connection.get()->read(1)[0];
+bool ConnectionManager::notifyFileAboutNewConnection(const std::shared_ptr<Connection> &connection) {
+    char header = connection->read(1)[0];
     if (header == PROTOCOL_PEER_INIT_HASH) {
-        std::string fileHash = connection.get()->read(32);
+        std::string fileHash = connection->read(32);
         for (auto &&fileHandler : fileHandlers) {
-            if (fileHandler.get()->file->getHash() == fileHash) {
-                fileHandler.get()->addConnection(connection);
+            if (fileHandler->file->getHash() == fileHash) {
+                fileHandler->addConnection(connection);
                 epoll_event epollEvent;
                 epollEvent.data.ptr = connection.get();
                 epollEvent.events = EPOLLIN;
-                epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection.get()->peerSocketDescriptor, &epollEvent);
-                connection.get()->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_ACK));
+                epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection->peerSocketDescriptor, &epollEvent);
+                connection->write(ProtocolUtils::encodeHeader(PROTOCOL_PEER_INIT_ACK));
                 return true;
             }
         }
@@ -70,9 +70,9 @@ void ConnectionManager::listenLoop() {
         while (true) {
             peerSocketDescriptor = accept(ownSocketDescriptor, (sockaddr *) &peerSocket, &sizeOfPeerSocket);
             std::shared_ptr<Connection> conn = std::make_shared<Connection>(peerSocketDescriptor, peerSocket);
-            LOG(INFO) << "Accepted new connection from " << conn.get()->getPeerIP() << ":" << conn.get()->getPeerPort();
+            LOG(INFO) << "Accepted new connection from " << conn->getPeerIP() << ":" << conn->getPeerPort();
             if (!notifyFileAboutNewConnection(conn)) {
-                LOG(DEBUG) << "FileHandler associated with connection " << conn.get()->getPeerIPandPort() << " not found";
+                LOG(DEBUG) << "FileHandler associated with connection " << conn->getPeerIPandPort() << " not found";
             }
         }
     }).detach();
@@ -82,17 +82,17 @@ ConnectionManager::~ConnectionManager() {
     close(epollDescriptor);
 }
 
-std::shared_ptr<Connection> ConnectionManager::requestConnection(std::string peerIP, uint16_t peerPort) {
+std::shared_ptr<Connection> ConnectionManager::requestConnection(const std::string &peerIP, uint16_t peerPort) const {
     std::shared_ptr<Connection> connection = std::make_shared<Connection>(peerIP, peerPort);
-    LOG(INFO) << "Created new connection to " << connection.get()->getPeerIP() << ":" << connection.get()->getPeerPort();
+    LOG(INFO) << "Created new connection to " << connection->getPeerIP() << ":" << connection->getPeerPort();
     epoll_event epollEvent;
     epollEvent.data.ptr = connection.get();
     epollEvent.events = EPOLLIN;
-    epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection.get()->peerSocketDescriptor, &epollEvent);
+    epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, connection->peerSocketDescriptor, &epollEvent);
     return connection;
 }
 
-void ConnectionManager::processIncomingConnections() {
+void ConnectionManager::processIncomingConnections() const {
     std::thread([&]() {
         epoll_event epollEvent {0};
         int rc;
@@ -100,7 +100,7 @@ void ConnectionManager::processIncomingConnections() {
             do {
                 rc = epoll_wait(epollDescriptor, &epollEvent, 1, -1);
             } while (rc == -1 && errno == EINTR);
-            Connection* connection = static_cast<Connection *>(epollEvent.data.ptr);
+            auto* connection = static_cast<Connection *>(epollEvent.data.ptr);
             if (connection != nullptr) {
                 connection->notify();
             }
@@ -108,16 +108,14 @@ void ConnectionManager::processIncomingConnections() {
     }).detach();
 }
 
-void ConnectionManager::addFileHandler(std::shared_ptr<FileHandler> newFileHandler) {
-    fileHandlersMutex.lock();
+void ConnectionManager::addFileHandler(const std::shared_ptr<FileHandler> &newFileHandler) {
+    std::lock_guard<std::mutex> guard(fileHandlersMutex);
     this->fileHandlers.push_back(newFileHandler);
-    fileHandlersMutex.unlock();
 }
 
 void ConnectionManager::setFileHandlers(std::vector<std::shared_ptr<FileHandler>> fileHandlers) {
-    fileHandlersMutex.lock();
-    this->fileHandlers = fileHandlers;
-    fileHandlersMutex.unlock();
+    std::lock_guard<std::mutex> guard(fileHandlersMutex);
+    this->fileHandlers = std::move(fileHandlers);
 }
 
 const std::vector<std::shared_ptr<FileHandler>>& ConnectionManager::getFileHandlers() const {
@@ -125,11 +123,11 @@ const std::vector<std::shared_ptr<FileHandler>>& ConnectionManager::getFileHandl
 }
 
 void ConnectionManager::setTrackerDetails(std::string trackerIP, uint16_t trackerPort) {
-    this->trackerIP = trackerIP;
+    this->trackerIP = std::move(trackerIP);
     this->trackerPort = trackerPort;
 }
 
-const std::string ConnectionManager::getTrackerIP() const {
+std::string ConnectionManager::getTrackerIP() const {
     return trackerIP;
 }
 
@@ -137,7 +135,7 @@ uint16_t ConnectionManager::getTrackerPort() const {
     return trackerPort;
 }
 
-void ConnectionManager::addToDownloadingFiles(std::shared_ptr<FileHandler> fileHandler) {
+void ConnectionManager::addToDownloadingFiles(const std::shared_ptr<FileHandler> &fileHandler) {
     this->currentlyDownloadingFiles.push_back(fileHandler);
 }
 
@@ -150,8 +148,8 @@ void ConnectionManager::removeFromDownloadingFiles(FileHandler* fileHandler) {
     }
 }
 
-bool ConnectionManager::isFileBeingDownloaded(FileInfo fileInfo) {
-    for (auto sptrFileHandler : this->currentlyDownloadingFiles) {
+bool ConnectionManager::isFileBeingDownloaded(const FileInfo& fileInfo) {
+    for (const auto &sptrFileHandler : this->currentlyDownloadingFiles) {
         if (sptrFileHandler->file->getHash() == fileInfo.getHash()) {
             LOG(INFO) << "File is being downlaoded already";
             return true;

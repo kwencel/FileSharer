@@ -19,7 +19,7 @@ class Connection {
          * @param peerIP IP address of the peer
          * @param peerPort IP adress of the peer
          */
-        Connection(std::string peerIP, uint16_t peerPort);
+        Connection(const std::string &peerIP, uint16_t peerPort);
 
         /**
          * Constructs an incoming connection
@@ -41,7 +41,7 @@ class Connection {
         /**
          * @return Peer's port
          */
-        uint16_t getPeerPort();
+        uint16_t getPeerPort() const;
 
         /**
          * @return Returns Peer's IP and port in pretty format IP:Port
@@ -53,7 +53,7 @@ class Connection {
          * @param data Information to be sent
          * @return Number of bytes that was sent
          */
-        ssize_t write(std::string data);
+        ssize_t write(const std::string &data) const;
 
         /**
          * Receives data from peer

@@ -85,8 +85,8 @@ void MainWindow::insertLocalFiles() {
 
 std::vector<FileInfo> MainWindow::getLocalFileInfos() {
     std::vector<FileInfo> fileInfos;
-    for (auto fileHandler : this->cm.getFileHandlers()) {
-        File &file = *fileHandler.get()->file;
+    for (const auto &fileHandler : this->cm.getFileHandlers()) {
+        File &file = *fileHandler->file;
         fileInfos.emplace_back(file.getFileInfo());
     }
     return fileInfos;
@@ -199,12 +199,12 @@ void MainWindow::updateFileDownloadProgress(FileHandler *fileHandler) {
     }
 }
 
-std::string MainWindow::isFileLocalAndDownloaded(FileInfo fileInfo) {
-    float progress = 0.0f;
+std::string MainWindow::isFileLocalAndDownloaded(const FileInfo &fileInfo) {
+    float progress;
     std::string result = "0";
-    for (auto fileSharedPtr : cm.getFileHandlers()) {
-        if (fileSharedPtr.get()->file->getHash() == fileInfo.getHash()) {
-            File *file = fileSharedPtr.get()->file.get();
+    for (const auto &fileSharedPtr : cm.getFileHandlers()) {
+        if (fileSharedPtr->file->getHash() == fileInfo.getHash()) {
+            File *file = fileSharedPtr->file.get();
             progress = (float) file->getDownloadedChunksAmount() / file->getChunksAmount();
             progress *= 100;
             std::stringstream stream;
