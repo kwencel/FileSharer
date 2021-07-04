@@ -1,5 +1,5 @@
 # FileSharer
-A P2P file sharing program. 
+A P2P file sharing program. It works only on Linux because it uses UNIX sockets (it was a requirement of the university assignment). 
 
 # Build prerequisites
     CMake 3.6 (it will probably compile using older versions too, see the last paragraph)
